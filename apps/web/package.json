@@ -11,14 +11,15 @@
     "check-types": "next typegen && tsc --noEmit"
   },
   "dependencies": {
-    "@repo/ui": "workspace:*",
+    "@personal-dashboard/shared": "workspace:*",
+    "@personal-dashboard/ui": "workspace:*",
     "next": "16.3.8",
     "react": "19.2.8",
     "react-dom": "19.2.8"
   },
   "devDependencies": {
-    "@repo/eslint-config": "workspace:*",
-    "@repo/typescript-config": "workspace:*",
+    "@personal-dashboard/eslint-config": "workspace:*",
+    "@personal-dashboard/typescript-config": "workspace:*",
     "@types/node": "26.4.1",
     "@types/react": "19.2.18",
     "@types/react-dom": "19.2.5",
