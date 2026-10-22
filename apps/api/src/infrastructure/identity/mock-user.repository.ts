@@ -1,6 +1,6 @@
 import { ConflictError } from '@personal-dashboard/shared/errors';
-import type { IUserRepository } from '../../application/identity/user-repository.interface.js';
-import type { User } from '../../domain/identity/user.js';
+import type { IUserRepository } from '@application/identity';
+import type { User } from '@domain/identity';
 
 /**
  * In-memory `IUserRepository`, for development and tests. Records live in a

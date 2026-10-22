@@ -1,5 +1,5 @@
 import argon2 from 'argon2';
-import type { IPasswordHasher } from '../../application/criptography/password-hasher.interface.js';
+import type { IPasswordHasher } from '@application/criptography';
 
 interface Argon2Params {
   /** Memory cost, in KiB. */

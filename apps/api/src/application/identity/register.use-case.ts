@@ -2,13 +2,10 @@ import type {
   IRegisterInput,
   IUserOutput,
 } from '@personal-dashboard/shared/identity';
-import { BirthDate } from '../../domain/common/birth-date.js';
-import { Email } from '../../domain/common/email.js';
-import { FullName } from '../../domain/common/full-name.js';
-import { PhoneNumber } from '../../domain/common/phone-number.js';
-import { User } from '../../domain/identity/user.js';
-import type { IUseCase } from '../common/use-case.interface.js';
-import type { IPasswordHasher } from '../criptography/password-hasher.interface.js';
+import { BirthDate, Email, FullName, PhoneNumber } from '@domain/common';
+import { User } from '@domain/identity';
+import type { IUseCase } from '@application/common';
+import type { IPasswordHasher } from '@application/criptography';
 import type { IUserRepository } from './user-repository.interface.js';
 
 /** Registers a new user and returns its public data. */

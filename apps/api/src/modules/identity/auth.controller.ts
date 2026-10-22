@@ -5,8 +5,8 @@ import {
   type IRegisterInput,
   type IUserOutput,
 } from '@personal-dashboard/shared/identity';
-import { RegisterUseCase } from '../../application/identity/register.use-case.js';
-import { ZodValidationPipe } from '../../common/zod-validation.pipe.js';
+import { RegisterUseCase } from '@application/identity';
+import { ZodValidationPipe } from '@common';
 
 @Controller('auth')
 export class AuthController {

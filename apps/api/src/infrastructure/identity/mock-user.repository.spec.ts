@@ -1,8 +1,6 @@
 import { ConflictError } from '@personal-dashboard/shared/errors';
-import { BirthDate } from '../../domain/common/birth-date.js';
-import { Email } from '../../domain/common/email.js';
-import { FullName } from '../../domain/common/full-name.js';
-import { User } from '../../domain/identity/user.js';
+import { BirthDate, Email, FullName } from '@domain/common';
+import { User } from '@domain/identity';
 import { MockUserRepository } from './mock-user.repository.js';
 
 const newUser = () =>

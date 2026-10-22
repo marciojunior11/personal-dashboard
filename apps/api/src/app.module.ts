@@ -2,8 +2,8 @@ import { Module } from '@nestjs/common';
 import { APP_FILTER } from '@nestjs/core';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
-import { ApiExceptionFilter } from './common/api-exception.filter.js';
-import { IdentityModule } from './modules/identity/identity.module.js';
+import { ApiExceptionFilter } from '@common';
+import { IdentityModule } from '@modules/identity';
 
 @Module({
   imports: [IdentityModule],

@@ -1,9 +1,8 @@
 import { Module } from '@nestjs/common';
-import type { IPasswordHasher } from '../../application/criptography/password-hasher.interface.js';
-import { RegisterUseCase } from '../../application/identity/register.use-case.js';
-import type { IUserRepository } from '../../application/identity/user-repository.interface.js';
-import { Argon2PasswordHasher } from '../../infrastructure/criptography/argon2-password-hasher.js';
-import { MockUserRepository } from '../../infrastructure/identity/mock-user.repository.js';
+import type { IPasswordHasher } from '@application/criptography';
+import { RegisterUseCase, type IUserRepository } from '@application/identity';
+import { Argon2PasswordHasher } from '@infrastructure/criptography';
+import { MockUserRepository } from '@infrastructure/identity';
 import { AuthController } from './auth.controller.js';
 import { PASSWORD_HASHER, USER_REPOSITORY } from './identity.tokens.js';
 

@@ -1,4 +1,4 @@
-import type { User } from '../../domain/identity/user.js';
+import type { User } from '@domain/identity';
 
 /** Persistence contract for users, implemented in the infrastructure layer. */
 export interface IUserRepository {

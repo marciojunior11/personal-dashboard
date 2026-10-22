@@ -2,7 +2,18 @@
   "$schema": "https://raw.githubusercontent.com/oxc-project/oxc/main/crates/oxc_linter/src/rules.rs",
   "rules": {
     "@typescript-eslint/no-explicit-any": "off",
-    "@typescript-eslint/no-floating-promises": "warn"
+    "@typescript-eslint/no-floating-promises": "warn",
+    "no-restricted-imports": [
+      "error",
+      {
+        "patterns": [
+          {
+            "regex": "^\\.\\./",
+            "message": "Import other folders through their alias (@domain/identity, @common, ...); relative imports are only for files in the same folder."
+          }
+        ]
+      }
+    ]
   },
   "env": {
     "node": true

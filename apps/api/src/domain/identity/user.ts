@@ -1,9 +1,11 @@
 import { DomainError } from '@personal-dashboard/shared/errors';
-import type { BirthDate } from '../common/birth-date.js';
-import type { Email } from '../common/email.js';
-import { Entity } from '../common/entity.js';
-import type { FullName } from '../common/full-name.js';
-import type { PhoneNumber } from '../common/phone-number.js';
+import {
+  type BirthDate,
+  type Email,
+  Entity,
+  type FullName,
+  type PhoneNumber,
+} from '@domain/common';
 
 export interface IUserProps {
   fullName: FullName;

@@ -1,8 +1,5 @@
 import { DomainError } from '@personal-dashboard/shared/errors';
-import { BirthDate } from '../common/birth-date.js';
-import { Email } from '../common/email.js';
-import { FullName } from '../common/full-name.js';
-import { PhoneNumber } from '../common/phone-number.js';
+import { BirthDate, Email, FullName, PhoneNumber } from '@domain/common';
 import { User, type IUserProps } from './user.js';
 
 const props = (overrides: Partial<IUserProps> = {}): IUserProps => ({

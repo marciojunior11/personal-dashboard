@@ -1,7 +1,7 @@
 import { DomainError } from '@personal-dashboard/shared/errors';
 import type { IRegisterInput } from '@personal-dashboard/shared/identity';
-import { MockUserRepository } from '../../infrastructure/identity/mock-user.repository.js';
-import type { IPasswordHasher } from '../criptography/password-hasher.interface.js';
+import { MockUserRepository } from '@infrastructure/identity';
+import type { IPasswordHasher } from '@application/criptography';
 import { RegisterUseCase } from './register.use-case.js';
 
 const fakeHasher: IPasswordHasher = {

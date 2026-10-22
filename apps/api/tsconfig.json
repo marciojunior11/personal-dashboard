@@ -17,6 +17,15 @@
     "skipLibCheck": true,
     "strict": true,
     "strictPropertyInitialization": false,
-    "types": ["vitest/globals", "node"]
+    "types": ["vitest/globals", "node"],
+    // Each alias points at a folder's barrel (index.ts), so only whole
+    // namespaces can be imported: never a file inside them, never a layer.
+    "paths": {
+      "@application/*": ["./src/application/*/index.ts"],
+      "@domain/*": ["./src/domain/*/index.ts"],
+      "@infrastructure/*": ["./src/infrastructure/*/index.ts"],
+      "@modules/*": ["./src/modules/*/index.ts"],
+      "@common": ["./src/common/index.ts"]
+    }
   }
 }
