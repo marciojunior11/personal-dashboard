@@ -4,7 +4,7 @@ import { BaseError } from "./base-error.js";
 export class InternalError extends BaseError {
   readonly code = "IE-001";
 
-  constructor(message = "Ocorreu um erro interno inesperado.") {
+  constructor(message = "Ocorreu um erro inesperado. Tente novamente mais tarde.") {
     super(message);
   }
 }
