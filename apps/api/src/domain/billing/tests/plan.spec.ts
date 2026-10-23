@@ -1,6 +1,6 @@
 import { DomainError } from '@personal-dashboard/shared/errors';
 import { Money } from '@domain/common';
-import { Plan, PlanCode, PlanPricing } from '@domain/billing';
+import { Plan, PlanCode, PlanPricing, PlanPricingType } from '@domain/billing';
 
 describe('Plan', () => {
   it('is identified by its code', () => {
@@ -12,7 +12,7 @@ describe('Plan', () => {
     expect(plan.id).toBe(PlanCode.LIMITED);
     expect(plan.code).toBe(PlanCode.LIMITED);
     expect(plan.maxActiveStudents).toBe(3);
-    expect(plan.pricing.type).toBe('FREE');
+    expect(plan.pricing.type).toBe(PlanPricingType.FREE);
   });
 
   it('accepts no cap on active students', () => {

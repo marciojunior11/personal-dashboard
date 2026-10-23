@@ -7,27 +7,38 @@ export interface IPriceTier {
   price: Money;
 }
 
-export type PlanPricingValue =
-  | { type: 'FREE' }
-  | { type: 'FLAT'; price: Money }
-  | { type: 'TIERED'; tiers: readonly IPriceTier[] };
-
 /**
- * How a plan charges per billing period:
- * FREE costs nothing, FLAT is a fixed price, and TIERED depends on how many
- * active students the organization has.
+ * FREE: costs nothing.
+ * FLAT: a fixed price.
+ * TIERED: depends on how many active students the organization has.
  */
+export const PlanPricingType = {
+  FREE: 'FREE',
+  FLAT: 'FLAT',
+  TIERED: 'TIERED',
+} as const;
+
+export type PlanPricingType =
+  (typeof PlanPricingType)[keyof typeof PlanPricingType];
+
+/** Each pricing type carries only the data it needs. */
+export type PlanPricingValue =
+  | { type: typeof PlanPricingType.FREE }
+  | { type: typeof PlanPricingType.FLAT; price: Money }
+  | { type: typeof PlanPricingType.TIERED; tiers: readonly IPriceTier[] };
+
+/** How a plan charges per billing period. */
 export class PlanPricing extends ValueObject<PlanPricingValue> {
   private constructor(value: PlanPricingValue) {
     super(value);
   }
 
   static free(): PlanPricing {
-    return new PlanPricing({ type: 'FREE' });
+    return new PlanPricing({ type: PlanPricingType.FREE });
   }
 
   static flat(price: Money): PlanPricing {
-    return new PlanPricing({ type: 'FLAT', price });
+    return new PlanPricing({ type: PlanPricingType.FLAT, price });
   }
 
   /**
@@ -53,21 +64,21 @@ export class PlanPricing extends ValueObject<PlanPricingValue> {
       previous = upTo;
     }
 
-    return new PlanPricing({ type: 'TIERED', tiers: [...tiers] });
+    return new PlanPricing({ type: PlanPricingType.TIERED, tiers: [...tiers] });
   }
 
-  get type(): PlanPricingValue['type'] {
+  get type(): PlanPricingType {
     return this.value.type;
   }
 
   /** The price of one billing period for the given number of active students. */
   priceFor(activeStudents: number): Money {
     switch (this.value.type) {
-      case 'FREE':
+      case PlanPricingType.FREE:
         return Money.zero();
-      case 'FLAT':
+      case PlanPricingType.FLAT:
         return this.value.price;
-      case 'TIERED':
+      case PlanPricingType.TIERED:
         // `tiered()` guarantees the last tier is unbounded, so one always matches.
         return this.value.tiers.find(
           ({ upTo }) => upTo === null || activeStudents <= upTo,
