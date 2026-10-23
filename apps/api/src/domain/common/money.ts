@@ -1,5 +1,5 @@
 import { DomainError } from '@personal-dashboard/shared/errors';
-import { ValueObject } from '@domain/common';
+import { ValueObject } from './value-object.js';
 
 /**
  * An amount in BRL, stored in cents to avoid floating-point rounding

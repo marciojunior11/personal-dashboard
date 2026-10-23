@@ -1,11 +1,6 @@
 import { DomainError } from '@personal-dashboard/shared/errors';
-import {
-  Money,
-  Plan,
-  PlanCode,
-  PlanPricing,
-  Subscription,
-} from '@domain/billing';
+import { Money } from '@domain/common';
+import { Plan, PlanCode, PlanPricing, Subscription } from '@domain/billing';
 
 const limited = () =>
   Plan.create(PlanCode.LIMITED, {

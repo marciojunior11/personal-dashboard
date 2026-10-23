@@ -1,5 +1,6 @@
 import { DomainError } from '@personal-dashboard/shared/errors';
-import { Money, Plan, PlanCode, PlanPricing } from '@domain/billing';
+import { Money } from '@domain/common';
+import { Plan, PlanCode, PlanPricing } from '@domain/billing';
 
 describe('Plan', () => {
   it('is identified by its code', () => {

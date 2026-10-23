@@ -1,5 +1,6 @@
 import { DomainError } from '@personal-dashboard/shared/errors';
-import { Money, PlanPricing } from '@domain/billing';
+import { Money } from '@domain/common';
+import { PlanPricing } from '@domain/billing';
 
 const brl = (cents: number) => Money.fromCents(cents);
 

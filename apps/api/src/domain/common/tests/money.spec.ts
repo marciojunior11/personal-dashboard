@@ -1,5 +1,5 @@
 import { DomainError } from '@personal-dashboard/shared/errors';
-import { Money } from '@domain/billing';
+import { Money } from '@domain/common';
 
 describe('Money', () => {
   it('stores the amount in cents', () => {

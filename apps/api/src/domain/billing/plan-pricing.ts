@@ -1,6 +1,5 @@
 import { DomainError } from '@personal-dashboard/shared/errors';
-import { ValueObject } from '@domain/common';
-import { Money } from './money.js';
+import { Money, ValueObject } from '@domain/common';
 
 /** A price band: applies while active students are at most `upTo`; `null` has no ceiling. */
 export interface IPriceTier {

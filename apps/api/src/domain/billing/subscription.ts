@@ -1,6 +1,5 @@
 import { DomainError } from '@personal-dashboard/shared/errors';
-import { Entity } from '@domain/common';
-import type { Money } from './money.js';
+import { Entity, type Money } from '@domain/common';
 import type { PlanPricing } from './plan-pricing.js';
 import type { Plan, PlanCode } from './plan.js';
 
