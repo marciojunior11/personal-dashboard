@@ -74,14 +74,4 @@ export class PlanPricing extends ValueObject<PlanPricingValue> {
         )!.price;
     }
   }
-
-  /** Compares by content: the base class compares by reference, which fails for objects. */
-  override equals(
-    other: ValueObject<PlanPricingValue> | null | undefined,
-  ): boolean {
-    return (
-      other instanceof PlanPricing &&
-      JSON.stringify(other.value) === JSON.stringify(this.value)
-    );
-  }
 }
