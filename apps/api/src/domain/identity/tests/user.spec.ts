@@ -1,6 +1,6 @@
 import { DomainError } from '@personal-dashboard/shared/errors';
 import { BirthDate, Email, FullName, PhoneNumber } from '@domain/common';
-import { User, type IUserProps } from './user.js';
+import { User, type IUserProps } from '@domain/identity';
 
 const props = (overrides: Partial<IUserProps> = {}): IUserProps => ({
   fullName: FullName.create('Maria da Silva'),

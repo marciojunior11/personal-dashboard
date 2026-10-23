@@ -2,7 +2,7 @@ import { DomainError } from '@personal-dashboard/shared/errors';
 import type { IRegisterInput } from '@personal-dashboard/shared/identity';
 import { MockUserRepository } from '@infrastructure/identity';
 import type { IPasswordHasher } from '@application/criptography';
-import { RegisterUseCase } from './register.use-case.js';
+import { RegisterUseCase } from '@application/identity';
 
 const fakeHasher: IPasswordHasher = {
   hash: async (password) => `hashed:${password}`,

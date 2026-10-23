@@ -1,8 +1,5 @@
 import { DomainError } from '@personal-dashboard/shared/errors';
-import { BirthDate } from './birth-date.js';
-import { Email } from './email.js';
-import { FullName } from './full-name.js';
-import { PhoneNumber } from './phone-number.js';
+import { BirthDate, Email, FullName, PhoneNumber } from '@domain/common';
 
 describe('FullName', () => {
   it('normalizes spaces', () => {

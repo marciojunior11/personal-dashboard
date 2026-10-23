@@ -15,6 +15,14 @@
       }
     ]
   },
+  "overrides": [
+    {
+      "files": ["src/tests/**", "tests/**"],
+      "rules": {
+        "no-restricted-imports": "off"
+      }
+    }
+  ],
   "env": {
     "node": true
   }
