@@ -8,7 +8,7 @@ describe('OrganizationName', () => {
     );
   });
 
-  it.each(['', ' ', 'A', 'A'.repeat(101)])('rejects %j', (raw) => {
+  it.each(['', ' ', 'A', 'A'.repeat(151)])('rejects %j', (raw) => {
     expect(() => OrganizationName.create(raw)).toThrow(DomainError);
   });
 });

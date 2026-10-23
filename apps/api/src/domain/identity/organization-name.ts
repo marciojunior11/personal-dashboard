@@ -2,7 +2,7 @@ import { DomainError } from '@personal-dashboard/shared/errors';
 import { ValueObject } from '@domain/common';
 
 const MIN_LENGTH = 2;
-const MAX_LENGTH = 100;
+const MAX_LENGTH = 150;
 
 /** An organization's display name (e.g. "Studio Força Total"). */
 export class OrganizationName extends ValueObject<string> {
