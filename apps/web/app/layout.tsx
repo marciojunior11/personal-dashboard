@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { ModeToggle } from "@/components/mode-toggle";
+import { ThemeProvider } from "@/components/theme-provider";
+import { cn } from "@/lib/utils";
 import "./globals.css";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
+  variable: "--font-sans",
 });
 const geistMono = localFont({
   src: "./fonts/GeistMonoVF.woff",
@@ -22,9 +25,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        {children}
+    // next-themes sets the theme class on <html> before React hydrates.
+    <html
+      lang="pt-BR"
+      className={cn("font-sans", geistSans.variable, geistMono.variable)}
+      suppressHydrationWarning
+    >
+      <body>
+        <ThemeProvider>
+          <div className="fixed top-4 right-4 z-50">
+            <ModeToggle />
+          </div>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
