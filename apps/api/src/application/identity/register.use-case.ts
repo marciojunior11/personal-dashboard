@@ -3,15 +3,37 @@ import type {
   IUserOutput,
 } from '@personal-dashboard/shared/identity';
 import { BirthDate, Email, FullName, PhoneNumber } from '@domain/common';
-import { User } from '@domain/identity';
-import type { IUseCase } from '@application/common';
+import { PlanCode, Subscription } from '@domain/billing';
+import {
+  Organization,
+  OrganizationMember,
+  OrganizationMemberRole,
+  OrganizationName,
+  OrganizationType,
+  User,
+} from '@domain/identity';
+import type {
+  IPlanRepository,
+  ISubscriptionRepository,
+} from '@application/billing';
+import { MisconfigurationError, type IUseCase } from '@application/common';
 import type { IPasswordHasher } from '@application/criptography';
+import type { IOrganizationMemberRepository } from './organization-member-repository.interface.js';
+import type { IOrganizationRepository } from './organization-repository.interface.js';
 import type { IUserRepository } from './user-repository.interface.js';
 
-/** Registers a new user and returns its public data. */
+/**
+ * Registers a self-employed professional: creates the user, an INDIVIDUAL
+ * organization named after them, their OWNER membership and a LIMITED
+ * subscription, then returns the user's public data.
+ */
 export class RegisterUseCase implements IUseCase<IRegisterInput, IUserOutput> {
   constructor(
     private readonly userRepository: IUserRepository,
+    private readonly organizationRepository: IOrganizationRepository,
+    private readonly memberRepository: IOrganizationMemberRepository,
+    private readonly planRepository: IPlanRepository,
+    private readonly subscriptionRepository: ISubscriptionRepository,
     private readonly passwordHasher: IPasswordHasher,
   ) {}
 
@@ -20,16 +42,48 @@ export class RegisterUseCase implements IUseCase<IRegisterInput, IUserOutput> {
    * boundary (`ZodValidationPipe`).
    *
    * @throws {DomainError} when the input breaks a domain rule.
+   * @throws {MisconfigurationError} when the catalog lacks the LIMITED plan.
+   * `BillingModule` refuses to start in that case, so this guard should never
+   * fire; it keeps the use case correct on its own.
    */
   async handle(data: IRegisterInput): Promise<IUserOutput> {
+    const fullName = FullName.create(data.nomeCompleto);
+    const birthDate = BirthDate.create(data.dataNascimento);
+    const email = data.email ? Email.create(data.email) : null;
+    const phone = data.celular ? PhoneNumber.create(data.celular) : null;
+
+    const plan = await this.planRepository.findByCode(PlanCode.LIMITED);
+    if (plan === null) {
+      throw new MisconfigurationError(
+        'Plano LIMITED não encontrado no catálogo: é o plano de toda organização nova, então o cadastro não pode continuar.',
+      );
+    }
+
     const user = User.create({
-      fullName: FullName.create(data.nomeCompleto),
-      birthDate: BirthDate.create(data.dataNascimento),
-      email: data.email ? Email.create(data.email) : null,
-      phone: data.celular ? PhoneNumber.create(data.celular) : null,
+      fullName,
+      birthDate,
+      email,
+      phone,
       passwordHash: await this.passwordHasher.hash(data.senha),
     });
+    const organization = Organization.create({
+      name: OrganizationName.create(fullName.value),
+      type: OrganizationType.INDIVIDUAL,
+    });
+    const owner = OrganizationMember.create({
+      userId: user.id,
+      organizationId: organization.id,
+      role: OrganizationMemberRole.OWNER,
+    });
+    const subscription = Subscription.create(organization.id, plan);
+
+    // Everything is built and validated before the first write. Without a
+    // transaction yet, a failed insert can still leave earlier ones behind;
+    // the user goes first because it is the one expected to conflict.
     await this.userRepository.insert(user);
+    await this.organizationRepository.insert(organization);
+    await this.memberRepository.insert(owner);
+    await this.subscriptionRepository.insert(subscription);
 
     return {
       id: user.id,

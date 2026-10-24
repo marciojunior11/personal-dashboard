@@ -1,13 +1,27 @@
-import { DomainError } from '@personal-dashboard/shared/errors';
+import { BaseError, DomainError } from '@personal-dashboard/shared/errors';
 import type { IRegisterInput } from '@personal-dashboard/shared/identity';
-import { MockUserRepository } from '@infrastructure/identity';
+import { PlanCode } from '@domain/billing';
+import { OrganizationMemberRole, OrganizationType } from '@domain/identity';
+import type { IPlanRepository } from '@application/billing';
+import { MisconfigurationError } from '@application/common';
 import type { IPasswordHasher } from '@application/criptography';
 import { RegisterUseCase } from '@application/identity';
+import {
+  MockPlanRepository,
+  MockSubscriptionRepository,
+} from '@infrastructure/billing';
+import {
+  MockOrganizationMemberRepository,
+  MockOrganizationRepository,
+  MockUserRepository,
+} from '@infrastructure/identity';
 
 const fakeHasher: IPasswordHasher = {
   hash: async (password) => `hashed:${password}`,
   compare: async (password, hash) => hash === `hashed:${password}`,
 };
+
+const emptyCatalog: IPlanRepository = { findByCode: async () => null };
 
 const input = (overrides: Partial<IRegisterInput> = {}): IRegisterInput => ({
   nomeCompleto: 'Maria da Silva',
@@ -19,16 +33,40 @@ const input = (overrides: Partial<IRegisterInput> = {}): IRegisterInput => ({
 });
 
 describe('RegisterUseCase', () => {
-  let repository: MockUserRepository;
+  let users: MockUserRepository;
+  let organizations: MockOrganizationRepository;
+  let members: MockOrganizationMemberRepository;
+  let subscriptions: MockSubscriptionRepository;
   let useCase: RegisterUseCase;
+
+  const createUseCase = (plans: IPlanRepository) =>
+    new RegisterUseCase(
+      users,
+      organizations,
+      members,
+      plans,
+      subscriptions,
+      fakeHasher,
+    );
+
+  /** Spies on every write, to assert nothing was persisted. */
+  const spyOnInserts = () => [
+    vi.spyOn(users, 'insert'),
+    vi.spyOn(organizations, 'insert'),
+    vi.spyOn(members, 'insert'),
+    vi.spyOn(subscriptions, 'insert'),
+  ];
 
   afterEach(() => {
     vi.restoreAllMocks();
   });
 
   beforeEach(() => {
-    repository = new MockUserRepository();
-    useCase = new RegisterUseCase(repository, fakeHasher);
+    users = new MockUserRepository();
+    organizations = new MockOrganizationRepository();
+    members = new MockOrganizationMemberRepository();
+    subscriptions = new MockSubscriptionRepository();
+    useCase = createUseCase(new MockPlanRepository());
   });
 
   it('registers the user and returns its public data', async () => {
@@ -46,9 +84,32 @@ describe('RegisterUseCase', () => {
 
   it('persists the user with the hashed password', async () => {
     const output = await useCase.handle(input());
-    const saved = await repository.findById(output.id);
+    const saved = await users.findById(output.id);
 
     expect(saved?.passwordHash).toBe('hashed:S3nh@Forte');
+  });
+
+  it('makes the user OWNER of a new INDIVIDUAL organization named after them', async () => {
+    const output = await useCase.handle(input());
+
+    const [owner, ...others] = await members.findByUserId(output.id);
+    expect(others).toHaveLength(0);
+    expect(owner.role).toBe(OrganizationMemberRole.OWNER);
+
+    const organization = await organizations.findById(owner.organizationId);
+    expect(organization?.type).toBe(OrganizationType.INDIVIDUAL);
+    expect(organization?.name.value).toBe('Maria da Silva');
+  });
+
+  it('subscribes the new organization to the LIMITED plan', async () => {
+    const output = await useCase.handle(input());
+    const [owner] = await members.findByUserId(output.id);
+
+    const subscription = await subscriptions.findByOrganizationId(
+      owner.organizationId,
+    );
+    expect(subscription?.planCode).toBe(PlanCode.LIMITED);
+    expect(subscription?.maxActiveStudents).toBe(3);
   });
 
   it('accepts only a phone', async () => {
@@ -63,16 +124,29 @@ describe('RegisterUseCase', () => {
     ['dataNascimento', { dataNascimento: '2023-02-30' }],
     ['celular', { celular: '10987654321' }],
   ])(
-    'throws DomainError when a domain rule is broken (%s), before hashing',
+    'throws DomainError when a domain rule is broken (%s), before hashing or writing',
     async (_, overrides) => {
       const hash = vi.spyOn(fakeHasher, 'hash');
-      const insert = vi.spyOn(repository, 'insert');
+      const inserts = spyOnInserts();
 
       await expect(useCase.handle(input(overrides))).rejects.toThrow(
         DomainError,
       );
       expect(hash).not.toHaveBeenCalled();
-      expect(insert).not.toHaveBeenCalled();
+      inserts.forEach((insert) => expect(insert).not.toHaveBeenCalled());
     },
   );
+
+  it('throws MisconfigurationError when the LIMITED plan is missing, before writing', async () => {
+    useCase = createUseCase(emptyCatalog);
+    const inserts = spyOnInserts();
+
+    const error = await useCase.handle(input()).catch((e: unknown) => e);
+
+    expect(error).toBeInstanceOf(MisconfigurationError);
+    // Not a BaseError, so the exception filter logs it and hides the details.
+    expect(error).not.toBeInstanceOf(BaseError);
+    expect((error as Error).message).toContain('Plano LIMITED não encontrado');
+    inserts.forEach((insert) => expect(insert).not.toHaveBeenCalled());
+  });
 });
