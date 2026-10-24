@@ -1,9 +1,11 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import type { FieldErrors } from "@personal-dashboard/shared/errors";
 import {
   registerInputSchema,
   type IRegisterInput,
+  type IUserOutput,
 } from "@personal-dashboard/shared/identity";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -24,6 +26,12 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { postJson } from "@/lib/api";
+
+/** `code` of a `ValidationError`, whose `data` holds messages per field. */
+const VALIDATION_ERROR_CODE = "VE-001";
+const UNREACHABLE_MESSAGE =
+  "Não foi possível falar com o servidor. Tente novamente mais tarde.";
 
 /** Sign-up page: the form that creates a professional's account. */
 export function RegistrationForm() {
@@ -39,17 +47,35 @@ export function RegistrationForm() {
     },
   });
 
-  function onSubmit(data: IRegisterInput) {
-    // The passwords are left out of the preview on purpose.
-    const { senha: _senha, confirmacaoSenha: _confirmacao, ...preview } = data;
-    toast("Você enviou os seguintes dados:", {
-      description: (
-        <pre className="mt-2 w-[320px] overflow-x-auto rounded-md bg-muted p-4">
-          <code>{JSON.stringify(preview, null, 2)}</code>
-        </pre>
-      ),
-      position: "bottom-right",
-    });
+  async function onSubmit(data: IRegisterInput) {
+    const result = await postJson<IUserOutput>("/auth/register", data).catch(
+      () => null,
+    );
+    if (result === null) {
+      toast.error(UNREACHABLE_MESSAGE);
+      return;
+    }
+
+    if (result.isSuccess) {
+      toast.success("Conta criada com sucesso!");
+      form.reset();
+      return;
+    }
+
+    // Input and domain rule errors come per field: show each next to its own.
+    const { error } = result;
+    if (error?.code === VALIDATION_ERROR_CODE) {
+      const fields = error.data as FieldErrors<keyof IRegisterInput>;
+      for (const [field, messages] of Object.entries(fields)) {
+        form.setError(field as keyof IRegisterInput, {
+          type: "server",
+          message: messages?.[0],
+        });
+      }
+      return;
+    }
+
+    toast.error(error?.message ?? UNREACHABLE_MESSAGE);
   }
 
   return (
@@ -213,8 +239,12 @@ export function RegistrationForm() {
             >
               Limpar
             </Button>
-            <Button type="submit" form="registration-form">
-              Criar conta
+            <Button
+              type="submit"
+              form="registration-form"
+              disabled={form.formState.isSubmitting}
+            >
+              {form.formState.isSubmitting ? "Criando conta..." : "Criar conta"}
             </Button>
           </Field>
         </CardFooter>

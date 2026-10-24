@@ -18,6 +18,7 @@ import type {
 } from '@application/billing';
 import { MisconfigurationError, type IUseCase } from '@application/common';
 import type { IPasswordHasher } from '@application/criptography';
+import { validateFields } from '@application/utils';
 import type { IOrganizationMemberRepository } from './organization-member-repository.interface.js';
 import type { IOrganizationRepository } from './organization-repository.interface.js';
 import type { IUserRepository } from './user-repository.interface.js';
@@ -41,16 +42,19 @@ export class RegisterUseCase implements IUseCase<IRegisterInput, IUserOutput> {
    * Expects `data` already validated against `registerInputSchema` at the
    * boundary (`ZodValidationPipe`).
    *
-   * @throws {DomainError} when the input breaks a domain rule.
+   * @throws {ValidationError} when input fields break domain rules, with each
+   * message under the field that broke it.
    * @throws {MisconfigurationError} when the catalog lacks the LIMITED plan.
    * `BillingModule` refuses to start in that case, so this guard should never
    * fire; it keeps the use case correct on its own.
    */
   async handle(data: IRegisterInput): Promise<IUserOutput> {
-    const fullName = FullName.create(data.nomeCompleto);
-    const birthDate = BirthDate.create(data.dataNascimento);
-    const email = data.email ? Email.create(data.email) : null;
-    const phone = data.celular ? PhoneNumber.create(data.celular) : null;
+    const { nomeCompleto, dataNascimento, email, celular } = validateFields({
+      nomeCompleto: () => FullName.create(data.nomeCompleto),
+      dataNascimento: () => BirthDate.create(data.dataNascimento),
+      email: () => (data.email ? Email.create(data.email) : null),
+      celular: () => (data.celular ? PhoneNumber.create(data.celular) : null),
+    });
 
     const plan = await this.planRepository.findByCode(PlanCode.LIMITED);
     if (plan === null) {
@@ -60,14 +64,14 @@ export class RegisterUseCase implements IUseCase<IRegisterInput, IUserOutput> {
     }
 
     const user = User.create({
-      fullName,
-      birthDate,
+      fullName: nomeCompleto,
+      birthDate: dataNascimento,
       email,
-      phone,
+      phone: celular,
       passwordHash: await this.passwordHasher.hash(data.senha),
     });
     const organization = Organization.create({
-      name: OrganizationName.create(fullName.value),
+      name: OrganizationName.create(nomeCompleto.value),
       type: OrganizationType.INDIVIDUAL,
     });
     const owner = OrganizationMember.create({
