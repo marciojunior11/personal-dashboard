@@ -64,16 +64,18 @@ describe('POST /auth/register (e2e)', () => {
     });
   });
 
-  it('answers 422 with a DomainError when a domain rule is broken', async () => {
+  it('answers 422 with the broken domain rule under its field', async () => {
     const response = await request(app.getHttpServer())
       .post('/auth/register')
       .send({ ...validInput, nomeCompleto: 'Maria' })
       .expect(422);
 
     expect(response.body.error).toMatchObject({
-      name: 'DomainError',
-      code: 'DE-001',
-      message: 'O nome completo deve conter nome e sobrenome.',
+      name: 'ValidationError',
+      code: 'VE-001',
+      data: {
+        nomeCompleto: ['O nome completo deve conter nome e sobrenome.'],
+      },
     });
   });
 
