@@ -13,7 +13,8 @@ export const PlanCode = {
   UNLIMITED: 'UNLIMITED',
 } as const;
 
-export type PlanCode = (typeof PlanCode)[keyof typeof PlanCode];
+export type PlanCode = 
+  (typeof PlanCode)[keyof typeof PlanCode];
 
 export interface IPlanProps {
   /** `null` means no cap. */
