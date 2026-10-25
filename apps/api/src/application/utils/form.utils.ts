@@ -1,7 +1,7 @@
 import {
   DomainError,
   ValidationError,
-  type FieldErrors,
+  type IErrorIssue,
 } from '@personal-dashboard/shared/errors';
 
 /** One factory per input field, each building that field's value. */
@@ -36,7 +36,7 @@ export function validateFields<TFactories extends FieldFactories>(
   factories: TFactories,
 ): FieldValues<TFactories> {
   const values: Partial<Record<keyof TFactories, unknown>> = {};
-  const errors: FieldErrors<Extract<keyof TFactories, string>> = {};
+  const issues: IErrorIssue[] = [];
 
   for (const field of Object.keys(factories) as Extract<
     keyof TFactories,
@@ -46,12 +46,12 @@ export function validateFields<TFactories extends FieldFactories>(
       values[field] = factories[field]();
     } catch (error) {
       if (!(error instanceof DomainError)) throw error;
-      errors[field] = [error.message];
+      issues.push({ field, code: error.code, message: error.message });
     }
   }
 
-  if (Object.keys(errors).length > 0) {
-    throw new ValidationError(errors);
+  if (issues.length > 0) {
+    throw new ValidationError(issues);
   }
 
   // Every factory ran without throwing, so every field holds its value.

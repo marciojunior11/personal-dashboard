@@ -56,12 +56,18 @@ describe('POST /auth/register (e2e)', () => {
     expect(response.body.isFailure).toBe(true);
     expect(response.body.error).toMatchObject({
       name: 'ValidationError',
-      code: 'VE-001',
-      data: {
-        email: ['E-mail inválido.'],
-        confirmacaoSenha: ['A confirmação de senha não confere.'],
-      },
+      code: 'INVALID_INPUT',
     });
+    expect(response.body.error.issues).toEqual(
+      expect.arrayContaining([
+        { field: 'email', code: 'INVALID_INPUT', message: 'E-mail inválido.' },
+        {
+          field: 'confirmacaoSenha',
+          code: 'INVALID_INPUT',
+          message: 'A confirmação de senha não confere.',
+        },
+      ]),
+    );
   });
 
   it('answers 422 with the broken domain rule under its field', async () => {
@@ -72,10 +78,14 @@ describe('POST /auth/register (e2e)', () => {
 
     expect(response.body.error).toMatchObject({
       name: 'ValidationError',
-      code: 'VE-001',
-      data: {
-        nomeCompleto: ['O nome completo deve conter nome e sobrenome.'],
-      },
+      code: 'INVALID_INPUT',
+      issues: [
+        {
+          field: 'nomeCompleto',
+          code: expect.any(String),
+          message: 'O nome completo deve conter nome e sobrenome.',
+        },
+      ],
     });
   });
 

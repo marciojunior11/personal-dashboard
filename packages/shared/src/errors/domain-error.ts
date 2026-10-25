@@ -1,10 +1,15 @@
 import { BaseError } from "./base-error.js";
+import { ErrorCode } from "./error-codes.js";
+import type { IErrorIssue } from "./error-issue.js";
 
 /** The operation breaks a domain rule. */
 export class DomainError extends BaseError {
-  readonly code = "DE-001";
+  readonly code: string = ErrorCode.DOMAIN_RULE_BROKEN;
 
-  constructor(message = "A operação viola uma regra de domínio.") {
-    super(message);
+  constructor(
+    message = "A operação viola uma regra de domínio.",
+    issues?: readonly IErrorIssue[],
+  ) {
+    super(message, issues);
   }
 }

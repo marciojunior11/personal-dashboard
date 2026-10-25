@@ -35,10 +35,18 @@ describe('validateFields', () => {
     })();
 
     expect(error).toBeInstanceOf(ValidationError);
-    expect((error as ValidationError).data).toEqual({
-      nomeCompleto: ['O nome completo deve conter nome e sobrenome.'],
-      email: ['E-mail inválido.'],
-    });
+    expect((error as ValidationError).issues).toEqual([
+      {
+        field: 'nomeCompleto',
+        code: 'DOMAIN_RULE_BROKEN',
+        message: 'O nome completo deve conter nome e sobrenome.',
+      },
+      {
+        field: 'email',
+        code: 'DOMAIN_RULE_BROKEN',
+        message: 'E-mail inválido.',
+      },
+    ]);
     expect(last).toHaveBeenCalledOnce();
   });
 
@@ -61,6 +69,12 @@ describe('validateFields', () => {
           throw new DomainError('Senha fraca.');
         },
       }),
-    ).toThrow(expect.objectContaining({ data: { senha: ['Senha fraca.'] } }));
+    ).toThrow(
+      expect.objectContaining({
+        issues: [
+          expect.objectContaining({ field: 'senha', message: 'Senha fraca.' }),
+        ],
+      }),
+    );
   });
 });

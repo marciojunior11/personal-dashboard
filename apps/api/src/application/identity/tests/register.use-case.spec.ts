@@ -132,8 +132,9 @@ describe('RegisterUseCase', () => {
       const error = await useCase.handle(input(overrides)).catch((e) => e);
 
       expect(error).toBeInstanceOf(ValidationError);
-      expect(Object.keys(error.data)).toEqual([field]);
-      expect(error.data[field]).toEqual([expect.any(String)]);
+      expect(error.issues).toEqual([
+        expect.objectContaining({ field, message: expect.any(String) }),
+      ]);
       expect(hash).not.toHaveBeenCalled();
       inserts.forEach((insert) => expect(insert).not.toHaveBeenCalled());
     },
@@ -145,10 +146,16 @@ describe('RegisterUseCase', () => {
       .catch((e) => e);
 
     expect(error).toBeInstanceOf(ValidationError);
-    expect(error.data).toEqual({
-      nomeCompleto: ['O nome completo deve conter nome e sobrenome.'],
-      celular: ['Número de celular inválido.'],
-    });
+    expect(error.issues).toEqual([
+      expect.objectContaining({
+        field: 'nomeCompleto',
+        message: 'O nome completo deve conter nome e sobrenome.',
+      }),
+      expect.objectContaining({
+        field: 'celular',
+        message: 'Número de celular inválido.',
+      }),
+    ]);
   });
 
   it('throws MisconfigurationError when the LIMITED plan is missing, before writing', async () => {
