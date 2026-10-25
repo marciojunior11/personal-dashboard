@@ -3,7 +3,7 @@ import { APP_FILTER } from '@nestjs/core';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import { ApiExceptionFilter } from '@common';
-import { IdentityModule } from '@modules/identity';
+import { IdentityModule } from '@presentation/identity';
 
 @Module({
   imports: [IdentityModule],

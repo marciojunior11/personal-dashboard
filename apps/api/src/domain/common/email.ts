@@ -1,4 +1,4 @@
-import { checkEmail, normalizeEmail } from '@personal-dashboard/shared/common';
+import { checkEmail, normalizeEmail } from '@personal-dashboard/shared/rules';
 import { DomainError } from '@personal-dashboard/shared/errors';
 import { ValueObject } from './value-object.js';
 

@@ -9,7 +9,7 @@ import {
   normalizeEmail,
   normalizeFullName,
   normalizePhoneNumber,
-} from "../common/rules/index.js";
+} from "../rules/index.js";
 import { rule } from "../utils/index.js";
 
 /** A string whose missing/wrong-type error is `code` instead of zod's default. */

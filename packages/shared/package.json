@@ -16,6 +16,10 @@
       "types": "./dist/identity/index.d.ts",
       "default": "./dist/identity/index.js"
     },
+    "./rules": {
+      "types": "./dist/rules/index.d.ts",
+      "default": "./dist/rules/index.js"
+    },
     "./utils": {
       "types": "./dist/utils/index.d.ts",
       "default": "./dist/utils/index.js"

@@ -1,7 +1,7 @@
 import { Test } from '@nestjs/testing';
 import type { IPlanRepository } from '@application/billing';
 import { MisconfigurationError } from '@application/common';
-import { BillingModule, PLAN_REPOSITORY } from '@modules/billing';
+import { BillingModule, PLAN_REPOSITORY } from '@presentation/billing';
 
 describe('BillingModule', () => {
   it('starts when the catalog has the required plans', async () => {

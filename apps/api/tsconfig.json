@@ -24,7 +24,7 @@
       "@application/*": ["./src/application/*/index.ts"],
       "@domain/*": ["./src/domain/*/index.ts"],
       "@infrastructure/*": ["./src/infrastructure/*/index.ts"],
-      "@modules/*": ["./src/modules/*/index.ts"],
+      "@presentation/*": ["./src/presentation/*/index.ts"],
       "@common": ["./src/common/index.ts"]
     }
   }

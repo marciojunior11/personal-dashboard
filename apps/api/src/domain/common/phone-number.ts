@@ -1,7 +1,7 @@
 import {
   checkPhoneNumber,
   normalizePhoneNumber,
-} from '@personal-dashboard/shared/common';
+} from '@personal-dashboard/shared/rules';
 import { DomainError } from '@personal-dashboard/shared/errors';
 import { ValueObject } from './value-object.js';
 

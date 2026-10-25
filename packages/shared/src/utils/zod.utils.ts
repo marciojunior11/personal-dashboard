@@ -1,5 +1,5 @@
 import type { MessageParams } from "@personal-dashboard/i18n";
-import type { IRuleViolation } from "../common/rules/index.js";
+import type { IRuleViolation } from "../rules/index.js";
 
 /** The part of zod's refinement context a rule needs; avoids importing zod. */
 interface IRefinementContext {

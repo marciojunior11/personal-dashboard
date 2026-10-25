@@ -5,7 +5,7 @@ import {
   checkPhoneNumber,
   normalizeEmail,
   normalizePhoneNumber,
-} from "../common/rules/index.js";
+} from "../rules/index.js";
 import { rule } from "../utils/index.js";
 
 /**
