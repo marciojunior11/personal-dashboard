@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { hasIssues } from "@personal-dashboard/shared/errors";
+import { hasIssues } from "@personal-dashboard/shared/utils";
 import {
   registerInputSchema,
   type IRegisterInput,

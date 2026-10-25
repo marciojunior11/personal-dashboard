@@ -1,5 +1,5 @@
-import type { ErrorJson } from "./base-error.js";
-import type { IErrorIssue } from "./error-issue.js";
+import type { ErrorJson } from "../errors/base-error.js";
+import type { IErrorIssue } from "../errors/error-issue.js";
 
 /**
  * Questions clients ask about an error received as JSON. `instanceof` does

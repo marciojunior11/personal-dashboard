@@ -2,7 +2,6 @@ export * from "./base-error.js";
 export * from "./conflict-error.js";
 export * from "./domain-error.js";
 export * from "./error-codes.js";
-export * from "./error-guards.js";
 export * from "./error-issue.js";
 export * from "./forbidden-error.js";
 export * from "./internal-error.js";

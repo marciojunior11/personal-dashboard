@@ -8,8 +8,8 @@ import {
   normalizeEmail,
   normalizeFullName,
   normalizePhoneNumber,
-  rule,
 } from "../common/rules/index.js";
+import { rule } from "../utils/index.js";
 
 /** A string whose missing/wrong-type error uses `message` instead of zod's default. */
 const requiredString = (message: string) => z.string({ error: message });

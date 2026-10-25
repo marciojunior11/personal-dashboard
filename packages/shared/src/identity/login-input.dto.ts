@@ -4,8 +4,8 @@ import {
   checkPhoneNumber,
   normalizeEmail,
   normalizePhoneNumber,
-  rule,
 } from "../common/rules/index.js";
+import { rule } from "../utils/index.js";
 
 const ONE_IDENTIFIER_MESSAGE = "Informe o e-mail ou o celular.";
 

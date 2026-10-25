@@ -5,4 +5,3 @@ export * from "./birth-date.rule.js";
 export * from "./email.rule.js";
 export * from "./full-name.rule.js";
 export * from "./phone-number.rule.js";
-export * from "./zod-rule.js";
