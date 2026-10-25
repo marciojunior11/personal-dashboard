@@ -1,14 +1,30 @@
 import { z } from "zod";
+import {
+  checkEmail,
+  checkPhoneNumber,
+  normalizeEmail,
+  normalizePhoneNumber,
+  rule,
+} from "../common/rules/index.js";
 
 const ONE_IDENTIFIER_MESSAGE = "Informe o e-mail ou o celular.";
 
-/** Validates the credentials used to log in, by e-mail or phone. */
+/**
+ * Validates the credentials used to log in, by e-mail or phone. Identifiers
+ * are normalized with the same rules used on sign-up, so they match the
+ * stored values however the user typed them.
+ */
 export const loginInputSchema = z
   .object({
-    email: z.email("E-mail inválido.").optional(),
+    email: z
+      .string({ error: "E-mail inválido." })
+      .transform(normalizeEmail)
+      .superRefine(rule(checkEmail))
+      .optional(),
     celular: z
       .string({ error: "Celular inválido." })
-      .min(1, "Celular inválido.")
+      .transform(normalizePhoneNumber)
+      .superRefine(rule(checkPhoneNumber))
       .optional(),
     senha: z
       .string({ error: "A senha é obrigatória." })

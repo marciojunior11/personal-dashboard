@@ -1,21 +1,20 @@
+import { checkEmail, normalizeEmail } from '@personal-dashboard/shared/common';
 import { DomainError } from '@personal-dashboard/shared/errors';
 import { ValueObject } from './value-object.js';
 
-const MAX_LENGTH = 254;
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-/** An e-mail address, stored trimmed and in lower case. */
+/**
+ * An e-mail address, stored trimmed and in lower case. Its rule is shared with
+ * the input schemas, which catch a bad value first, by its field.
+ */
 export class Email extends ValueObject<string> {
   private constructor(value: string) {
     super(value);
   }
 
   static create(raw: string): Email {
-    const value = raw.trim().toLowerCase();
-
-    if (value.length > MAX_LENGTH || !EMAIL_PATTERN.test(value)) {
-      throw new DomainError('E-mail inválido.');
-    }
+    const value = normalizeEmail(raw);
+    const problem = checkEmail(value);
+    if (problem !== null) throw new DomainError(problem);
 
     return new Email(value);
   }
