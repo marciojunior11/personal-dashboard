@@ -27,12 +27,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { postJson } from "@/lib/api";
 import { ClientMessage } from "@/lib/messages";
-import { translatedZodResolver } from "@/utils/form.utils";
+import { codedZodResolver } from "@/utils/form.utils";
 
 /** Sign-up page: the form that creates a professional's account. */
 export function RegistrationForm() {
   const form = useForm<IRegisterInput>({
-    resolver: translatedZodResolver(registerInputSchema),
+    resolver: codedZodResolver(registerInputSchema),
     defaultValues: {
       nomeCompleto: "",
       dataNascimento: "",
