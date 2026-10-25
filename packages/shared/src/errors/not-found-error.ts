@@ -1,15 +1,15 @@
+import type { MessageCode, MessageParams } from "@personal-dashboard/i18n";
 import { BaseError } from "./base-error.js";
 import { ErrorCode } from "./error-codes.js";
-import type { IErrorIssue } from "./error-issue.js";
+import type { IFieldIssue } from "./error-issue.js";
 
 /** The requested resource does not exist. */
 export class NotFoundError extends BaseError {
-  readonly code: string = ErrorCode.NOT_FOUND;
-
   constructor(
-    message = "Recurso não encontrado.",
-    issues?: readonly IErrorIssue[],
+    code: MessageCode = ErrorCode.NOT_FOUND,
+    params?: MessageParams,
+    issues?: readonly IFieldIssue[],
   ) {
-    super(message, issues);
+    super(code, params, issues);
   }
 }

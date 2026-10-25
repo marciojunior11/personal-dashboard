@@ -1,3 +1,4 @@
+import { MessageCode } from "@personal-dashboard/i18n";
 import { z } from "zod";
 import {
   checkEmail,
@@ -7,8 +8,6 @@ import {
 } from "../common/rules/index.js";
 import { rule } from "../utils/index.js";
 
-const ONE_IDENTIFIER_MESSAGE = "Informe o e-mail ou o celular.";
-
 /**
  * Validates the credentials used to log in, by e-mail or phone. Identifiers
  * are normalized with the same rules used on sign-up, so they match the
@@ -17,18 +16,18 @@ const ONE_IDENTIFIER_MESSAGE = "Informe o e-mail ou o celular.";
 export const loginInputSchema = z
   .object({
     email: z
-      .string({ error: "E-mail inválido." })
+      .string({ error: MessageCode.EMAIL_INVALID })
       .transform(normalizeEmail)
       .superRefine(rule(checkEmail))
       .optional(),
     celular: z
-      .string({ error: "Celular inválido." })
+      .string({ error: MessageCode.PHONE_NUMBER_INVALID })
       .transform(normalizePhoneNumber)
       .superRefine(rule(checkPhoneNumber))
       .optional(),
     senha: z
-      .string({ error: "A senha é obrigatória." })
-      .min(1, "A senha é obrigatória."),
+      .string({ error: MessageCode.PASSWORD_REQUIRED })
+      .min(1, MessageCode.PASSWORD_REQUIRED),
   })
   .superRefine((data, ctx) => {
     if (data.email || data.celular) return;
@@ -36,7 +35,7 @@ export const loginInputSchema = z
       ctx.addIssue({
         code: "custom",
         path: [field],
-        message: ONE_IDENTIFIER_MESSAGE,
+        message: MessageCode.EMAIL_OR_PHONE_REQUIRED,
       });
     }
   });

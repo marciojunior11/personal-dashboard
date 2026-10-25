@@ -5,6 +5,7 @@ import {
   type ArgumentsHost,
   type ExceptionFilter,
 } from '@nestjs/common';
+import { resolveLocale } from '@personal-dashboard/i18n';
 import { ApiResult } from '@personal-dashboard/shared/common';
 import {
   BaseError,
@@ -16,7 +17,7 @@ import {
   UnauthorizedError,
   ValidationError,
 } from '@personal-dashboard/shared/errors';
-import type { Response } from 'express';
+import type { Request, Response } from 'express';
 
 type ErrorType = abstract new (...args: never[]) => BaseError;
 
@@ -34,13 +35,20 @@ const STATUS_BY_ERROR: [ErrorType, number][] = [
  * Turns every thrown error into an `ApiResult.failure` response with the
  * matching HTTP status. Unexpected errors are logged and answered as a
  * generic `InternalError`, so internal details never reach the client.
+ *
+ * Errors carry message codes; this is where they become text, in the locale
+ * the request asks for (`Accept-Language`), or the default one.
  */
 @Catch()
 export class ApiExceptionFilter implements ExceptionFilter {
   private readonly logger = new Logger(ApiExceptionFilter.name);
 
   catch(exception: unknown, host: ArgumentsHost): void {
-    const response = host.switchToHttp().getResponse<Response>();
+    const http = host.switchToHttp();
+    const response = http.getResponse<Response>();
+    const locale = resolveLocale(
+      http.getRequest<Request>().headers['accept-language'],
+    );
 
     // Nest's own errors (unknown route, malformed JSON...) keep their status and body.
     if (exception instanceof HttpException) {
@@ -58,6 +66,6 @@ export class ApiExceptionFilter implements ExceptionFilter {
     const status =
       STATUS_BY_ERROR.find(([type]) => error instanceof type)?.[1] ?? 500;
 
-    response.status(status).json(ApiResult.failure(error));
+    response.status(status).json(ApiResult.failure(error).serialize(locale));
   }
 }

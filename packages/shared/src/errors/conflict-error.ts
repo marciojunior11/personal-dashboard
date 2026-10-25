@@ -1,15 +1,15 @@
+import type { MessageCode, MessageParams } from "@personal-dashboard/i18n";
 import { BaseError } from "./base-error.js";
 import { ErrorCode } from "./error-codes.js";
-import type { IErrorIssue } from "./error-issue.js";
+import type { IFieldIssue } from "./error-issue.js";
 
 /** The operation conflicts with the current state (e.g. duplicated resource). */
 export class ConflictError extends BaseError {
-  readonly code: string = ErrorCode.CONFLICT;
-
   constructor(
-    message = "O recurso já existe ou conflita com o estado atual.",
-    issues?: readonly IErrorIssue[],
+    code: MessageCode = ErrorCode.CONFLICT,
+    params?: MessageParams,
+    issues?: readonly IFieldIssue[],
   ) {
-    super(message, issues);
+    super(code, params, issues);
   }
 }

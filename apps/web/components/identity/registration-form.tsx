@@ -1,6 +1,5 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { hasIssues } from "@personal-dashboard/shared/utils";
 import {
   registerInputSchema,
@@ -28,11 +27,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { postJson } from "@/lib/api";
 import { ClientMessage } from "@/lib/messages";
+import { translatedZodResolver } from "@/utils/form.utils";
 
 /** Sign-up page: the form that creates a professional's account. */
 export function RegistrationForm() {
   const form = useForm<IRegisterInput>({
-    resolver: zodResolver(registerInputSchema),
+    resolver: translatedZodResolver(registerInputSchema),
     defaultValues: {
       nomeCompleto: "",
       dataNascimento: "",

@@ -1,3 +1,4 @@
+import { MessageCode } from '@personal-dashboard/i18n';
 import { DomainError } from '@personal-dashboard/shared/errors';
 import {
   type BirthDate,
@@ -28,12 +29,10 @@ export class User extends Entity<string> {
     super(id);
 
     if (props.email === null && props.phone === null) {
-      throw new DomainError(
-        'O usuário deve ter ao menos um e-mail ou celular.',
-      );
+      throw new DomainError(MessageCode.USER_EMAIL_OR_PHONE_REQUIRED);
     }
     if (props.passwordHash.length === 0) {
-      throw new DomainError('O usuário deve ter uma senha.');
+      throw new DomainError(MessageCode.USER_PASSWORD_REQUIRED);
     }
   }
 

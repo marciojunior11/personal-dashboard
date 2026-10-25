@@ -1,3 +1,4 @@
+import { MessageCode } from '@personal-dashboard/i18n';
 import { DomainError } from '@personal-dashboard/shared/errors';
 import { Entity } from '@domain/common';
 import type { PlanPricing } from './plan-pricing.js';
@@ -13,8 +14,7 @@ export const PlanCode = {
   UNLIMITED: 'UNLIMITED',
 } as const;
 
-export type PlanCode = 
-  (typeof PlanCode)[keyof typeof PlanCode];
+export type PlanCode = (typeof PlanCode)[keyof typeof PlanCode];
 
 export interface IPlanProps {
   /** `null` means no cap. */
@@ -36,9 +36,7 @@ export class Plan extends Entity<PlanCode> {
 
     const max = props.maxActiveStudents;
     if (max !== null && (!Number.isSafeInteger(max) || max < 1)) {
-      throw new DomainError(
-        'O limite de alunos ativos do plano deve ser um inteiro positivo.',
-      );
+      throw new DomainError(MessageCode.PLAN_MAX_ACTIVE_STUDENTS_INVALID);
     }
   }
 

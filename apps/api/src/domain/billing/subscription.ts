@@ -1,3 +1,4 @@
+import { MessageCode } from '@personal-dashboard/i18n';
 import { DomainError } from '@personal-dashboard/shared/errors';
 import { Entity, type Money } from '@domain/common';
 import type { PlanPricing } from './plan-pricing.js';
@@ -27,7 +28,7 @@ export class Subscription extends Entity<string> {
     super(id);
 
     if (props.organizationId.length === 0) {
-      throw new DomainError('A assinatura deve pertencer a uma organização.');
+      throw new DomainError(MessageCode.SUBSCRIPTION_ORGANIZATION_REQUIRED);
     }
   }
 

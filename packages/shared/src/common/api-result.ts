@@ -1,3 +1,4 @@
+import { DEFAULT_LOCALE, type Locale } from "@personal-dashboard/i18n";
 import type { BaseError, ErrorJson } from "../errors/base-error.js";
 
 /** Wire format of an `ApiResult`, as received by API clients. */
@@ -48,16 +49,21 @@ export class ApiResult<T = void> {
   }
 
   /**
-   * Called by `JSON.stringify`: includes `isSuccess` / `isFailure` and lets
-   * the error serialize itself (`code`, `data`, ...). The stack is never
-   * exposed.
+   * The result as clients receive it: includes `isSuccess` / `isFailure` and
+   * lets the error serialize itself, with its messages in `locale`. The stack
+   * is never exposed.
    */
-  toJSON(): ApiResultJson<T> {
+  serialize(locale: Locale): ApiResultJson<T> {
     return {
       isSuccess: this.isSuccess,
       isFailure: this.isFailure,
       value: this.value,
-      error: this.error?.toJSON() ?? null,
+      error: this.error?.serialize(locale) ?? null,
     };
+  }
+
+  /** Called by `JSON.stringify`, in the default locale. */
+  toJSON(): ApiResultJson<T> {
+    return this.serialize(DEFAULT_LOCALE);
   }
 }

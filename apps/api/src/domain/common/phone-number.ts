@@ -17,8 +17,10 @@ export class PhoneNumber extends ValueObject<string> {
 
   static create(raw: string): PhoneNumber {
     const value = normalizePhoneNumber(raw);
-    const problem = checkPhoneNumber(value);
-    if (problem !== null) throw new DomainError(problem);
+    const violation = checkPhoneNumber(value);
+    if (violation !== null) {
+      throw new DomainError(violation.code, violation.params);
+    }
 
     return new PhoneNumber(value);
   }

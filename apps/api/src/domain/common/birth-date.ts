@@ -19,8 +19,10 @@ export class BirthDate extends ValueObject<string> {
   /** `today` is injectable so validation can be tested deterministically. */
   static create(raw: string, today: Date = new Date()): BirthDate {
     const value = normalizeBirthDate(raw);
-    const problem = checkBirthDate(value, today);
-    if (problem !== null) throw new DomainError(problem);
+    const violation = checkBirthDate(value, today);
+    if (violation !== null) {
+      throw new DomainError(violation.code, violation.params);
+    }
 
     return new BirthDate(value);
   }

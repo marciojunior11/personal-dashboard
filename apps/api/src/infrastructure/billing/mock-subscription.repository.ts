@@ -1,3 +1,4 @@
+import { MessageCode } from '@personal-dashboard/i18n';
 import { ConflictError } from '@personal-dashboard/shared/errors';
 import type { ISubscriptionRepository } from '@application/billing';
 import type { Subscription } from '@domain/billing';
@@ -18,7 +19,7 @@ export class MockSubscriptionRepository implements ISubscriptionRepository {
           existing.organizationId === subscription.organizationId,
       )
     ) {
-      throw new ConflictError('A organização já possui uma assinatura.');
+      throw new ConflictError(MessageCode.SUBSCRIPTION_DUPLICATED);
     }
 
     this.subscriptions.push(subscription);

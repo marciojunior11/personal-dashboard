@@ -1,3 +1,4 @@
+import { MessageCode } from '@personal-dashboard/i18n';
 import { ConflictError } from '@personal-dashboard/shared/errors';
 import type { IUserRepository } from '@application/identity';
 import type { User } from '@domain/identity';
@@ -11,7 +12,7 @@ export class MockUserRepository implements IUserRepository {
 
   async insert(user: User): Promise<void> {
     if (this.users.some((existing) => existing.equals(user))) {
-      throw new ConflictError(`Já existe um usuário com o id ${user.id}.`);
+      throw new ConflictError(MessageCode.USER_ID_TAKEN, { id: user.id });
     }
 
     this.users.push(user);

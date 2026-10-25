@@ -1,3 +1,4 @@
+import { MessageCode } from '@personal-dashboard/i18n';
 import { ConflictError } from '@personal-dashboard/shared/errors';
 import type { IOrganizationRepository } from '@application/identity';
 import type { Organization } from '@domain/identity';
@@ -11,9 +12,9 @@ export class MockOrganizationRepository implements IOrganizationRepository {
 
   async insert(organization: Organization): Promise<void> {
     if (this.organizations.some((existing) => existing.equals(organization))) {
-      throw new ConflictError(
-        `Já existe uma organização com o id ${organization.id}.`,
-      );
+      throw new ConflictError(MessageCode.ORGANIZATION_ID_TAKEN, {
+        id: organization.id,
+      });
     }
 
     this.organizations.push(organization);
