@@ -1,3 +1,4 @@
+import { IdentityErrorCodes } from '@personal-dashboard/shared/identity';
 import { DomainError } from '@personal-dashboard/shared/errors';
 import { ValueObject } from '@domain/common';
 
@@ -16,7 +17,11 @@ export class OrganizationName extends ValueObject<string> {
 
     if (value.length < MIN_LENGTH || value.length > MAX_LENGTH) {
       throw new DomainError(
-        `O nome da organização deve ter entre ${MIN_LENGTH} e ${MAX_LENGTH} caracteres.`,
+        IdentityErrorCodes.ORGANIZATION_NAME_INVALID_LENGTH,
+        {
+          min: MIN_LENGTH,
+          max: MAX_LENGTH,
+        },
       );
     }
 

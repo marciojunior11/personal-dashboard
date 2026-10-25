@@ -1,6 +1,13 @@
 packages:
   - "apps/*"
   - "packages/*"
+packageExtensions:
+  # nestjs-i18n requires typescript to generate the translation key types but
+  # does not declare it, so it resolved the hoisted TypeScript 7, which has no
+  # compiler API. As a peer it gets the consumer's TypeScript 6 (apps/api).
+  nestjs-i18n:
+    peerDependencies:
+      typescript: "*"
 allowBuilds:
   argon2: false
 minimumReleaseAgeExclude:

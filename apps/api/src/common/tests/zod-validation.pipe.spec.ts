@@ -1,10 +1,25 @@
+import { CommonErrorCodes } from '@personal-dashboard/shared/common';
 import { ValidationError } from '@personal-dashboard/shared/errors';
 import { z } from 'zod';
 import { ZodValidationPipe } from '@common';
 
 const schema = z.object({
-  name: z.string().min(1, 'Obrigatório.').max(3, 'Muito longo.'),
-  address: z.object({ street: z.string().min(3, 'Muito curto.') }),
+  name: z
+    .string({ error: CommonErrorCodes.FULL_NAME_REQUIRED })
+    .min(1, CommonErrorCodes.FULL_NAME_REQUIRED)
+    .superRefine((value, ctx) => {
+      if (value.length > 3) {
+        ctx.addIssue({
+          code: 'custom',
+          message: CommonErrorCodes.FULL_NAME_TOO_LONG,
+          params: { max: 3 },
+        });
+      }
+    }),
+  address: z.object({
+    street: z.string().min(3, CommonErrorCodes.INVALID_INPUT),
+  }),
+  age: z.number().optional(),
 });
 
 const invalidIssues = (value: unknown) => {
@@ -23,22 +38,29 @@ describe('ZodValidationPipe', () => {
     expect(new ZodValidationPipe(schema).transform(value)).toEqual(value);
   });
 
-  it('reports every invalid field at once, by field path', () => {
+  it('reports every invalid field at once, by field path, with its code', () => {
     expect(invalidIssues({ name: '', address: { street: 'R' } })).toEqual([
-      { field: 'name', code: 'INVALID_INPUT', message: 'Obrigatório.' },
-      {
-        field: 'address.street',
-        code: 'INVALID_INPUT',
-        message: 'Muito curto.',
-      },
+      { field: 'name', code: 'FULL_NAME_REQUIRED' },
+      { field: 'address.street', code: 'INVALID_INPUT' },
     ]);
   });
 
+  it('keeps the params of a rule issue', () => {
+    expect(
+      invalidIssues({ name: 'Maria', address: { street: 'Rua A' } }),
+    ).toEqual([
+      { field: 'name', code: 'FULL_NAME_TOO_LONG', params: { max: 3 } },
+    ]);
+  });
+
+  it("files zod's own messages under the generic code", () => {
+    expect(
+      invalidIssues({ name: 'Ana', address: { street: 'Rua A' }, age: 'x' }),
+    ).toEqual([{ field: 'age', code: 'INVALID_INPUT' }]);
+  });
+
   it('reports only the first broken rule of a field', () => {
-    const issues = invalidIssues({
-      name: 123,
-      address: { street: 'Rua A' },
-    });
+    const issues = invalidIssues({ name: 123, address: { street: 'Rua A' } });
 
     expect(issues).toHaveLength(1);
     expect(issues[0].field).toBe('name');

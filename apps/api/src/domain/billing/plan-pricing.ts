@@ -1,3 +1,4 @@
+import { BillingErrorCodes } from '@personal-dashboard/shared/billing';
 import { DomainError } from '@personal-dashboard/shared/errors';
 import { Money, ValueObject } from '@domain/common';
 
@@ -49,16 +50,14 @@ export class PlanPricing extends ValueObject<PlanPricingValue> {
     const last = tiers.at(-1);
 
     if (last === undefined || last.upTo !== null) {
-      throw new DomainError(
-        'As faixas de preço devem terminar em uma faixa sem limite.',
-      );
+      throw new DomainError(BillingErrorCodes.PLAN_PRICING_LAST_TIER_BOUNDED);
     }
 
     let previous = 0;
     for (const { upTo } of tiers.slice(0, -1)) {
       if (upTo === null || !Number.isSafeInteger(upTo) || upTo <= previous) {
         throw new DomainError(
-          'As faixas de preço devem ter limites inteiros e crescentes.',
+          BillingErrorCodes.PLAN_PRICING_TIERS_NOT_ASCENDING,
         );
       }
       previous = upTo;

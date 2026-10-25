@@ -1,3 +1,6 @@
+import { CommonErrorCodes } from "../common/common-error-codes.js";
+import type { IRuleViolation } from "./rule-violation.interface.js";
+
 const ISO_DATE_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/;
 const MAX_AGE = 130;
 
@@ -24,10 +27,10 @@ export function ageOn(isoDate: string, date: Date): number {
 export function checkBirthDate(
   value: string,
   today: Date = new Date(),
-): string | null {
+): IRuleViolation | null {
   const match = ISO_DATE_PATTERN.exec(value);
   if (!match) {
-    return "Data de nascimento inválida. Use o formato AAAA-MM-DD.";
+    return { code: CommonErrorCodes.BIRTH_DATE_INVALID_FORMAT };
   }
 
   const [year = 0, month = 0, day = 0] = match.slice(1).map(Number);
@@ -38,11 +41,11 @@ export function checkBirthDate(
     date.getUTCMonth() !== month - 1 ||
     date.getUTCDate() !== day
   ) {
-    return "Data de nascimento inválida.";
+    return { code: CommonErrorCodes.BIRTH_DATE_INVALID };
   }
 
   const age = ageOn(value, today);
-  if (age < 0) return "A data de nascimento não pode estar no futuro.";
-  if (age > MAX_AGE) return "Data de nascimento inválida.";
+  if (age < 0) return { code: CommonErrorCodes.BIRTH_DATE_IN_FUTURE };
+  if (age > MAX_AGE) return { code: CommonErrorCodes.BIRTH_DATE_INVALID };
   return null;
 }

@@ -1,13 +1,13 @@
 import { z } from "zod";
+import { CommonErrorCodes } from "../common/common-error-codes.js";
 import {
   checkEmail,
   checkPhoneNumber,
   normalizeEmail,
   normalizePhoneNumber,
-} from "../common/rules/index.js";
+} from "../rules/index.js";
 import { rule } from "../utils/index.js";
-
-const ONE_IDENTIFIER_MESSAGE = "Informe o e-mail ou o celular.";
+import { IdentityErrorCodes } from "./identity-error-codes.js";
 
 /**
  * Validates the credentials used to log in, by e-mail or phone. Identifiers
@@ -17,18 +17,18 @@ const ONE_IDENTIFIER_MESSAGE = "Informe o e-mail ou o celular.";
 export const loginInputSchema = z
   .object({
     email: z
-      .string({ error: "E-mail inválido." })
+      .string({ error: CommonErrorCodes.EMAIL_INVALID })
       .transform(normalizeEmail)
       .superRefine(rule(checkEmail))
       .optional(),
     celular: z
-      .string({ error: "Celular inválido." })
+      .string({ error: CommonErrorCodes.PHONE_NUMBER_INVALID })
       .transform(normalizePhoneNumber)
       .superRefine(rule(checkPhoneNumber))
       .optional(),
     senha: z
-      .string({ error: "A senha é obrigatória." })
-      .min(1, "A senha é obrigatória."),
+      .string({ error: IdentityErrorCodes.PASSWORD_REQUIRED })
+      .min(1, IdentityErrorCodes.PASSWORD_REQUIRED),
   })
   .superRefine((data, ctx) => {
     if (data.email || data.celular) return;
@@ -36,7 +36,7 @@ export const loginInputSchema = z
       ctx.addIssue({
         code: "custom",
         path: [field],
-        message: ONE_IDENTIFIER_MESSAGE,
+        message: IdentityErrorCodes.EMAIL_OR_PHONE_REQUIRED,
       });
     }
   });

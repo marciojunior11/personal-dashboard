@@ -1,15 +1,14 @@
+import { CommonErrorCodes } from "../common/common-error-codes.js";
 import { BaseError } from "./base-error.js";
-import { ErrorCode } from "./error-codes.js";
-import type { IErrorIssue } from "./error-issue.js";
+import type { ErrorParams, IFieldIssue } from "./error-issue.js";
 
 /** The operation conflicts with the current state (e.g. duplicated resource). */
 export class ConflictError extends BaseError {
-  readonly code: string = ErrorCode.CONFLICT;
-
   constructor(
-    message = "O recurso já existe ou conflita com o estado atual.",
-    issues?: readonly IErrorIssue[],
+    code: string = CommonErrorCodes.CONFLICT,
+    params?: ErrorParams,
+    issues?: readonly IFieldIssue[],
   ) {
-    super(message, issues);
+    super(code, params, issues);
   }
 }

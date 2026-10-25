@@ -1,7 +1,7 @@
 import {
   checkFullName,
   normalizeFullName,
-} from '@personal-dashboard/shared/common';
+} from '@personal-dashboard/shared/rules';
 import { DomainError } from '@personal-dashboard/shared/errors';
 import { ValueObject } from './value-object.js';
 
@@ -17,8 +17,10 @@ export class FullName extends ValueObject<string> {
   /** Trims and collapses inner spaces before validating. */
   static create(raw: string): FullName {
     const value = normalizeFullName(raw);
-    const problem = checkFullName(value);
-    if (problem !== null) throw new DomainError(problem);
+    const violation = checkFullName(value);
+    if (violation !== null) {
+      throw new DomainError(violation.code, violation.params);
+    }
 
     return new FullName(value);
   }

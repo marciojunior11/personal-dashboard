@@ -20,7 +20,7 @@ import {
   BillingModule,
   PLAN_REPOSITORY,
   SUBSCRIPTION_REPOSITORY,
-} from '@modules/billing';
+} from '@presentation/billing';
 import { AuthController } from './auth.controller.js';
 import {
   ORGANIZATION_MEMBER_REPOSITORY,

@@ -1,4 +1,4 @@
-import { checkEmail, normalizeEmail } from '@personal-dashboard/shared/common';
+import { checkEmail, normalizeEmail } from '@personal-dashboard/shared/rules';
 import { DomainError } from '@personal-dashboard/shared/errors';
 import { ValueObject } from './value-object.js';
 
@@ -13,8 +13,10 @@ export class Email extends ValueObject<string> {
 
   static create(raw: string): Email {
     const value = normalizeEmail(raw);
-    const problem = checkEmail(value);
-    if (problem !== null) throw new DomainError(problem);
+    const violation = checkEmail(value);
+    if (violation !== null) {
+      throw new DomainError(violation.code, violation.params);
+    }
 
     return new Email(value);
   }

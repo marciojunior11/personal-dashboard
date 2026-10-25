@@ -1,0 +1,11 @@
+{
+  "name": "@personal-dashboard/i18n",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Translation resources: one folder per locale, one JSON catalog per module. No code, and nothing about errors.",
+  "type": "module",
+  "exports": {
+    "./package.json": "./package.json",
+    "./locales/*": "./locales/*"
+  }
+}

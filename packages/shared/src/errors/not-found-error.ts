@@ -1,15 +1,14 @@
+import { CommonErrorCodes } from "../common/common-error-codes.js";
 import { BaseError } from "./base-error.js";
-import { ErrorCode } from "./error-codes.js";
-import type { IErrorIssue } from "./error-issue.js";
+import type { ErrorParams, IFieldIssue } from "./error-issue.js";
 
 /** The requested resource does not exist. */
 export class NotFoundError extends BaseError {
-  readonly code: string = ErrorCode.NOT_FOUND;
-
   constructor(
-    message = "Recurso não encontrado.",
-    issues?: readonly IErrorIssue[],
+    code: string = CommonErrorCodes.NOT_FOUND,
+    params?: ErrorParams,
+    issues?: readonly IFieldIssue[],
   ) {
-    super(message, issues);
+    super(code, params, issues);
   }
 }

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { CommonErrorCodes } from "../common/common-error-codes.js";
 import {
   checkBirthDate,
   checkEmail,
@@ -8,13 +9,12 @@ import {
   normalizeEmail,
   normalizeFullName,
   normalizePhoneNumber,
-} from "../common/rules/index.js";
+} from "../rules/index.js";
 import { rule } from "../utils/index.js";
+import { IdentityErrorCodes } from "./identity-error-codes.js";
 
-/** A string whose missing/wrong-type error uses `message` instead of zod's default. */
-const requiredString = (message: string) => z.string({ error: message });
-
-const ONE_IDENTIFIER_MESSAGE = "Informe ao menos um e-mail ou celular.";
+/** A string whose missing/wrong-type error is `code` instead of zod's default. */
+const requiredString = (code: string) => z.string({ error: code });
 
 /**
  * Validates the data required to register a new user. Field formats use the
@@ -23,36 +23,38 @@ const ONE_IDENTIFIER_MESSAGE = "Informe ao menos um e-mail ou celular.";
  */
 export const registerInputSchema = z
   .object({
-    nomeCompleto: requiredString("O nome completo é obrigatório.")
+    nomeCompleto: requiredString(CommonErrorCodes.FULL_NAME_REQUIRED)
       .trim()
-      .min(1, "O nome completo é obrigatório.")
+      .min(1, CommonErrorCodes.FULL_NAME_REQUIRED)
       .transform(normalizeFullName)
       .superRefine(rule(checkFullName)),
     /** ISO 8601 date (`YYYY-MM-DD`). */
-    dataNascimento: requiredString("A data de nascimento é obrigatória.")
+    dataNascimento: requiredString(CommonErrorCodes.BIRTH_DATE_REQUIRED)
       .trim()
-      .min(1, "A data de nascimento é obrigatória.")
+      .min(1, CommonErrorCodes.BIRTH_DATE_REQUIRED)
       .transform(normalizeBirthDate)
       .superRefine(rule(checkBirthDate)),
     email: z
-      .string({ error: "E-mail inválido." })
+      .string({ error: CommonErrorCodes.EMAIL_INVALID })
       .transform(normalizeEmail)
       .superRefine(rule(checkEmail))
       .optional(),
     celular: z
-      .string({ error: "Celular inválido." })
+      .string({ error: CommonErrorCodes.PHONE_NUMBER_INVALID })
       .transform(normalizePhoneNumber)
       .superRefine(rule(checkPhoneNumber))
       .optional(),
-    senha: requiredString("A senha é obrigatória.").min(
+    senha: requiredString(IdentityErrorCodes.PASSWORD_REQUIRED).min(
       1,
-      "A senha é obrigatória.",
+      IdentityErrorCodes.PASSWORD_REQUIRED,
     ),
-    confirmacaoSenha: requiredString("A confirmação de senha é obrigatória."),
+    confirmacaoSenha: requiredString(
+      IdentityErrorCodes.PASSWORD_CONFIRMATION_REQUIRED,
+    ),
   })
   .refine((data) => data.senha === data.confirmacaoSenha, {
     path: ["confirmacaoSenha"],
-    message: "A confirmação de senha não confere.",
+    message: IdentityErrorCodes.PASSWORD_CONFIRMATION_MISMATCH,
   })
   .superRefine((data, ctx) => {
     if (data.email || data.celular) return;
@@ -60,7 +62,7 @@ export const registerInputSchema = z
       ctx.addIssue({
         code: "custom",
         path: [field],
-        message: ONE_IDENTIFIER_MESSAGE,
+        message: IdentityErrorCodes.EMAIL_OR_PHONE_REQUIRED,
       });
     }
   });

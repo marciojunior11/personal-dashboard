@@ -20,12 +20,15 @@
     "types": ["vitest/globals", "node"],
     // Each alias points at a folder's barrel (index.ts), so only whole
     // namespaces can be imported: never a file inside them, never a layer.
+    // @generated is the exception: files written by tools (e.g. the i18n
+    // key types nestjs-i18n generates), imported one by one.
     "paths": {
       "@application/*": ["./src/application/*/index.ts"],
       "@domain/*": ["./src/domain/*/index.ts"],
       "@infrastructure/*": ["./src/infrastructure/*/index.ts"],
-      "@modules/*": ["./src/modules/*/index.ts"],
-      "@common": ["./src/common/index.ts"]
+      "@presentation/*": ["./src/presentation/*/index.ts"],
+      "@common": ["./src/common/index.ts"],
+      "@generated/*": ["./src/generated/*.generated.ts"]
     }
   }
 }

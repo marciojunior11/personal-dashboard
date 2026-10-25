@@ -60,10 +60,10 @@ describe('POST /auth/register (e2e)', () => {
     });
     expect(response.body.error.issues).toEqual(
       expect.arrayContaining([
-        { field: 'email', code: 'INVALID_INPUT', message: 'E-mail inválido.' },
+        { field: 'email', code: 'EMAIL_INVALID', message: 'E-mail inválido.' },
         {
           field: 'confirmacaoSenha',
-          code: 'INVALID_INPUT',
+          code: 'PASSWORD_CONFIRMATION_MISMATCH',
           message: 'A confirmação de senha não confere.',
         },
       ]),
@@ -84,16 +84,33 @@ describe('POST /auth/register (e2e)', () => {
       expect.arrayContaining([
         {
           field: 'nomeCompleto',
-          code: 'INVALID_INPUT',
+          code: 'FULL_NAME_MISSING_SURNAME',
           message: 'O nome completo deve conter nome e sobrenome.',
         },
         {
           field: 'celular',
-          code: 'INVALID_INPUT',
+          code: 'PHONE_NUMBER_INVALID',
           message: 'Número de celular inválido.',
         },
       ]),
     );
+  });
+
+  it('answers in the default locale when the requested one is not supported', async () => {
+    const response = await request(app.getHttpServer())
+      .post('/auth/register')
+      .set('Accept-Language', 'fr-FR,de;q=0.9')
+      .send({ ...validInput, nomeCompleto: 'Maria' })
+      .expect(422);
+
+    expect(response.body.error.message).toBe(
+      'Os dados informados são inválidos.',
+    );
+    expect(response.body.error.issues[0]).toMatchObject({
+      field: 'nomeCompleto',
+      code: 'FULL_NAME_MISSING_SURNAME',
+      message: 'O nome completo deve conter nome e sobrenome.',
+    });
   });
 
   it('keeps Nest errors for unknown routes', async () => {

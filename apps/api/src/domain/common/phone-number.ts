@@ -1,7 +1,7 @@
 import {
   checkPhoneNumber,
   normalizePhoneNumber,
-} from '@personal-dashboard/shared/common';
+} from '@personal-dashboard/shared/rules';
 import { DomainError } from '@personal-dashboard/shared/errors';
 import { ValueObject } from './value-object.js';
 
@@ -17,8 +17,10 @@ export class PhoneNumber extends ValueObject<string> {
 
   static create(raw: string): PhoneNumber {
     const value = normalizePhoneNumber(raw);
-    const problem = checkPhoneNumber(value);
-    if (problem !== null) throw new DomainError(problem);
+    const violation = checkPhoneNumber(value);
+    if (violation !== null) {
+      throw new DomainError(violation.code, violation.params);
+    }
 
     return new PhoneNumber(value);
   }

@@ -1,11 +1,12 @@
-import type { IErrorIssue } from "./error-issue.js";
+import type { ErrorParams, IErrorIssue, IFieldIssue } from "./error-issue.js";
 
 /** Wire format of an error, as received by API clients. */
 export interface ErrorJson {
   /** The category, e.g. `ConflictError`. */
   name: string;
-  /** Why it failed; see `ErrorCode` for the generic ones. */
+  /** What kind of error happened, from a module's error codes. */
   code: string;
+  /** The message, in the client's locale. */
   message: string;
   /** Problems tied to input fields; present only when there are any. */
   issues?: IErrorIssue[];
@@ -13,32 +14,22 @@ export interface ErrorJson {
 
 /**
  * Base class for every application error. The class is the category (and so
- * the HTTP status); `code` is the reason, and `issues` say which input fields
- * it concerns, if any.
+ * the HTTP status); `code` reports what kind of error happened, and `issues`
+ * which input fields it concerns, if any.
  *
- * Each category declares its generic `code` (from `ErrorCode`) and a default
- * message. A case the client must tell apart gets its own subclass, which
- * overrides `code` and carries its message, so a `throw` never spells them out.
+ * Errors hold no text and know nothing about translation: the API's
+ * presentation layer picks the message for each code, in the client's
+ * locale. `message` is the code itself, which keeps logs stable.
  */
 export abstract class BaseError extends Error {
-  /** Stable identifier of the error, used by clients to handle it. */
-  abstract readonly code: string;
-
   protected constructor(
-    message: string,
-    public readonly issues: readonly IErrorIssue[] = [],
+    /** What kind of error happened; clients branch on it. */
+    public readonly code: string,
+    /** Values the message needs (e.g. `{ max: 150 }`). */
+    public readonly params?: ErrorParams,
+    public readonly issues: readonly IFieldIssue[] = [],
   ) {
-    super(message);
+    super(code);
     this.name = new.target.name;
-  }
-
-  /** Called by `JSON.stringify`. The stack is never exposed. */
-  toJSON(): ErrorJson {
-    return {
-      name: this.name,
-      code: this.code,
-      message: this.message,
-      ...(this.issues.length > 0 && { issues: [...this.issues] }),
-    };
   }
 }
