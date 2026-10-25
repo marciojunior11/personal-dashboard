@@ -4,13 +4,17 @@
   "private": true,
   "type": "module",
   "exports": {
-    "./errors": {
-      "types": "./dist/errors/index.d.ts",
-      "default": "./dist/errors/index.js"
+    "./billing": {
+      "types": "./dist/billing/index.d.ts",
+      "default": "./dist/billing/index.js"
     },
     "./common": {
       "types": "./dist/common/index.d.ts",
       "default": "./dist/common/index.js"
+    },
+    "./errors": {
+      "types": "./dist/errors/index.d.ts",
+      "default": "./dist/errors/index.js"
     },
     "./identity": {
       "types": "./dist/identity/index.d.ts",
@@ -39,7 +43,6 @@
     "typescript": "7.0.2"
   },
   "dependencies": {
-    "@personal-dashboard/i18n": "workspace:*",
     "zod": "^4.6.7"
   }
 }

@@ -1,4 +1,4 @@
-import type { MessageParams } from "@personal-dashboard/i18n";
+import type { ErrorParams } from "../errors/error-issue.js";
 import type { IRuleViolation } from "../rules/index.js";
 
 /** The part of zod's refinement context a rule needs; avoids importing zod. */
@@ -6,7 +6,7 @@ interface IRefinementContext {
   addIssue(issue: {
     code: "custom";
     message: string;
-    params?: MessageParams;
+    params?: ErrorParams;
   }): void;
 }
 
@@ -15,9 +15,9 @@ interface IRefinementContext {
  * the same function as the domain's value object, and the issue lands on
  * that field: `z.string().transform(normalizeX).superRefine(rule(checkX))`.
  *
- * Like every message in the shared schemas, the issue's `message` is a
- * message code, not a text; its params travel in `params`. Whoever shows the
- * issue translates it, in its own locale.
+ * Like every message in the shared schemas, the issue's `message` is an
+ * error code, not a text; its params travel in `params`. Whoever shows the
+ * issue picks its message, in its own locale.
  */
 export function rule(check: (value: string) => IRuleViolation | null) {
   return (value: string, ctx: IRefinementContext): void => {

@@ -1,0 +1,12 @@
+/** Error codes of the billing module: plans and subscriptions. */
+export const BillingErrorCodes = {
+  PLAN_MAX_ACTIVE_STUDENTS_INVALID: "PLAN_MAX_ACTIVE_STUDENTS_INVALID",
+  PLAN_PRICING_LAST_TIER_BOUNDED: "PLAN_PRICING_LAST_TIER_BOUNDED",
+  PLAN_PRICING_TIERS_NOT_ASCENDING: "PLAN_PRICING_TIERS_NOT_ASCENDING",
+
+  SUBSCRIPTION_ORGANIZATION_REQUIRED: "SUBSCRIPTION_ORGANIZATION_REQUIRED",
+  SUBSCRIPTION_DUPLICATED: "SUBSCRIPTION_DUPLICATED",
+} as const;
+
+export type BillingErrorCode =
+  (typeof BillingErrorCodes)[keyof typeof BillingErrorCodes];

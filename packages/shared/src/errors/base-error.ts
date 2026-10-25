@@ -1,19 +1,12 @@
-import {
-  DEFAULT_LOCALE,
-  translate,
-  type Locale,
-  type MessageCode,
-  type MessageParams,
-} from "@personal-dashboard/i18n";
-import type { IErrorIssue, IFieldIssue } from "./error-issue.js";
+import type { ErrorParams, IErrorIssue, IFieldIssue } from "./error-issue.js";
 
 /** Wire format of an error, as received by API clients. */
 export interface ErrorJson {
   /** The category, e.g. `ConflictError`. */
   name: string;
-  /** Why it failed; also the message key. */
+  /** What kind of error happened, from a module's error codes. */
   code: string;
-  /** The message in the client's locale. */
+  /** The message, in the client's locale. */
   message: string;
   /** Problems tied to input fields; present only when there are any. */
   issues?: IErrorIssue[];
@@ -21,45 +14,22 @@ export interface ErrorJson {
 
 /**
  * Base class for every application error. The class is the category (and so
- * the HTTP status); `code` is the reason, and `issues` say which input fields
- * it concerns, if any.
+ * the HTTP status); `code` reports what kind of error happened, and `issues`
+ * which input fields it concerns, if any.
  *
- * An error holds no text: its code is a key of `@personal-dashboard/i18n`,
- * translated when serialized, in the locale the client asked for. `message`
- * holds the default-locale text, for logs and tests.
+ * Errors hold no text and know nothing about translation: the API's
+ * presentation layer picks the message for each code, in the client's
+ * locale. `message` is the code itself, which keeps logs stable.
  */
 export abstract class BaseError extends Error {
   protected constructor(
-    /** Stable identifier of the error, used by clients to handle it. */
-    public readonly code: MessageCode,
-    /** Values for the message placeholders. */
-    public readonly params?: MessageParams,
+    /** What kind of error happened; clients branch on it. */
+    public readonly code: string,
+    /** Values the message needs (e.g. `{ max: 150 }`). */
+    public readonly params?: ErrorParams,
     public readonly issues: readonly IFieldIssue[] = [],
   ) {
-    super(translate(code, params));
+    super(code);
     this.name = new.target.name;
-  }
-
-  /** The error as clients receive it, with its messages in `locale`. */
-  serialize(locale: Locale): ErrorJson {
-    return {
-      name: this.name,
-      code: this.code,
-      message: translate(this.code, this.params, locale),
-      ...(this.issues.length > 0 && {
-        issues: this.issues.map((issue) => ({
-          ...issue,
-          message: translate(issue.code, issue.params, locale),
-        })),
-      }),
-    };
-  }
-
-  /**
-   * Called by `JSON.stringify`, in the default locale. The stack is never
-   * exposed. To answer in the client's locale, call `serialize` instead.
-   */
-  toJSON(): ErrorJson {
-    return this.serialize(DEFAULT_LOCALE);
   }
 }

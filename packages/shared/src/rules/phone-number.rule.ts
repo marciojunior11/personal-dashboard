@@ -1,4 +1,4 @@
-import { MessageCode } from "@personal-dashboard/i18n";
+import { CommonErrorCodes } from "../common/common-error-codes.js";
 import type { IRuleViolation } from "./rule-violation.interface.js";
 
 /** Area code (DDD, 11–99 without zeros) + `9` + 8 digits. */
@@ -19,5 +19,5 @@ export function normalizePhoneNumber(raw: string): string {
 export function checkPhoneNumber(value: string): IRuleViolation | null {
   return BR_MOBILE_PATTERN.test(value)
     ? null
-    : { code: MessageCode.PHONE_NUMBER_INVALID };
+    : { code: CommonErrorCodes.PHONE_NUMBER_INVALID };
 }

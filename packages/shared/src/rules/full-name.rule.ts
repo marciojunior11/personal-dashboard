@@ -1,4 +1,4 @@
-import { MessageCode } from "@personal-dashboard/i18n";
+import { CommonErrorCodes } from "../common/common-error-codes.js";
 import type { IRuleViolation } from "./rule-violation.interface.js";
 
 export const FULL_NAME_MAX_LENGTH = 150;
@@ -18,16 +18,16 @@ export function checkFullName(value: string): IRuleViolation | null {
   const words = value.split(" ");
 
   if (words.length < 2) {
-    return { code: MessageCode.FULL_NAME_MISSING_SURNAME };
+    return { code: CommonErrorCodes.FULL_NAME_MISSING_SURNAME };
   }
   if (value.length > FULL_NAME_MAX_LENGTH) {
     return {
-      code: MessageCode.FULL_NAME_TOO_LONG,
+      code: CommonErrorCodes.FULL_NAME_TOO_LONG,
       params: { max: FULL_NAME_MAX_LENGTH },
     };
   }
   if (!words.every((word) => WORD_PATTERN.test(word))) {
-    return { code: MessageCode.FULL_NAME_INVALID_CHARACTERS };
+    return { code: CommonErrorCodes.FULL_NAME_INVALID_CHARACTERS };
   }
   return null;
 }

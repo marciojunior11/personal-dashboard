@@ -1,4 +1,4 @@
-import { MessageCode } from "@personal-dashboard/i18n";
+import { CommonErrorCodes } from "../common/common-error-codes.js";
 import type { IRuleViolation } from "./rule-violation.interface.js";
 
 const ISO_DATE_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/;
@@ -30,7 +30,7 @@ export function checkBirthDate(
 ): IRuleViolation | null {
   const match = ISO_DATE_PATTERN.exec(value);
   if (!match) {
-    return { code: MessageCode.BIRTH_DATE_INVALID_FORMAT };
+    return { code: CommonErrorCodes.BIRTH_DATE_INVALID_FORMAT };
   }
 
   const [year = 0, month = 0, day = 0] = match.slice(1).map(Number);
@@ -41,11 +41,11 @@ export function checkBirthDate(
     date.getUTCMonth() !== month - 1 ||
     date.getUTCDate() !== day
   ) {
-    return { code: MessageCode.BIRTH_DATE_INVALID };
+    return { code: CommonErrorCodes.BIRTH_DATE_INVALID };
   }
 
   const age = ageOn(value, today);
-  if (age < 0) return { code: MessageCode.BIRTH_DATE_IN_FUTURE };
-  if (age > MAX_AGE) return { code: MessageCode.BIRTH_DATE_INVALID };
+  if (age < 0) return { code: CommonErrorCodes.BIRTH_DATE_IN_FUTURE };
+  if (age > MAX_AGE) return { code: CommonErrorCodes.BIRTH_DATE_INVALID };
   return null;
 }

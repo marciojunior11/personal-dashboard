@@ -1,5 +1,4 @@
-import { DEFAULT_LOCALE, type Locale } from "@personal-dashboard/i18n";
-import type { BaseError, ErrorJson } from "../errors/base-error.js";
+import type { ErrorJson } from "../errors/base-error.js";
 
 /** Wire format of an `ApiResult`, as received by API clients. */
 export interface ApiResultJson<T = void> {
@@ -13,13 +12,14 @@ export interface ApiResultJson<T = void> {
  * Standard return structure for any API method.
  *
  * `ApiResult` (no type argument) carries no value; `ApiResult<T>` carries a
- * `T` on success. Instances are built through the static factories
- * (`success` / `failure`), never with `new`.
+ * `T` on success. A failure carries the error as clients receive it, its
+ * messages already in their locale. Instances are built through the static
+ * factories (`success` / `failure`), never with `new`.
  */
 export class ApiResult<T = void> {
   private constructor(
     public readonly value: T | null,
-    public readonly error: BaseError | null,
+    public readonly error: ErrorJson | null,
   ) {}
 
   /** `true` if and only if there is no error. */
@@ -44,26 +44,17 @@ export class ApiResult<T = void> {
    * Builds a failed result carrying `error`, with no value. Its type fits any
    * `ApiResult<T>`.
    */
-  static failure(error: BaseError): ApiResult<never> {
+  static failure(error: ErrorJson): ApiResult<never> {
     return new ApiResult<never>(null, error);
   }
 
-  /**
-   * The result as clients receive it: includes `isSuccess` / `isFailure` and
-   * lets the error serialize itself, with its messages in `locale`. The stack
-   * is never exposed.
-   */
-  serialize(locale: Locale): ApiResultJson<T> {
+  /** Called by `JSON.stringify`: includes `isSuccess` / `isFailure`. */
+  toJSON(): ApiResultJson<T> {
     return {
       isSuccess: this.isSuccess,
       isFailure: this.isFailure,
       value: this.value,
-      error: this.error?.serialize(locale) ?? null,
+      error: this.error,
     };
-  }
-
-  /** Called by `JSON.stringify`, in the default locale. */
-  toJSON(): ApiResultJson<T> {
-    return this.serialize(DEFAULT_LOCALE);
   }
 }

@@ -1,4 +1,4 @@
-import { MessageCode } from "@personal-dashboard/i18n";
+import { CommonErrorCodes } from "../common/common-error-codes.js";
 import type { IRuleViolation } from "./rule-violation.interface.js";
 
 const MAX_LENGTH = 254;
@@ -16,5 +16,5 @@ export function normalizeEmail(raw: string): string {
 export function checkEmail(value: string): IRuleViolation | null {
   return value.length <= MAX_LENGTH && EMAIL_PATTERN.test(value)
     ? null
-    : { code: MessageCode.EMAIL_INVALID };
+    : { code: CommonErrorCodes.EMAIL_INVALID };
 }
