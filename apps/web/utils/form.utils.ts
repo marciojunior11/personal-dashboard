@@ -1,19 +1,27 @@
 import { toNestErrors } from "@hookform/resolvers";
-import { CommonErrorCodes } from "@personal-dashboard/shared/common";
+import { BillingErrorMessages } from "@personal-dashboard/shared/billing";
+import {
+  CommonErrorCodes,
+  CommonErrorMessages,
+} from "@personal-dashboard/shared/common";
 import type { ErrorParams } from "@personal-dashboard/shared/errors";
+import { IdentityErrorMessages } from "@personal-dashboard/shared/identity";
 import type { FieldError, FieldValues, Resolver } from "react-hook-form";
 import type { z } from "zod";
-import { ERROR_MESSAGES } from "@/lib/error-messages";
+import { translate } from "@/utils/i18n.utils";
 
-/** The text of an error code, with its `{placeholders}` filled in. */
+/** Catalog key of every error code, from the maps each module shares. */
+const ERROR_MESSAGES: Readonly<Record<string, string>> = {
+  ...CommonErrorMessages,
+  ...IdentityErrorMessages,
+  ...BillingErrorMessages,
+};
+
+/** The text of an error code; an unknown code shows the generic one. */
 function messageOf(code: string, params?: ErrorParams): string {
-  const template =
-    ERROR_MESSAGES[code as keyof typeof ERROR_MESSAGES] ??
-    ERROR_MESSAGES[CommonErrorCodes.INVALID_INPUT] ??
-    code;
-  return template.replace(/\{(\w+)\}/g, (placeholder, name: string) =>
-    String(params?.[name] ?? placeholder),
-  );
+  const key =
+    ERROR_MESSAGES[code] ?? CommonErrorMessages[CommonErrorCodes.INVALID_INPUT];
+  return translate(key, params) ?? code;
 }
 
 /**
