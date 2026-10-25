@@ -1,9 +1,0 @@
-{
-  "extends": "@personal-dashboard/typescript-config/base.json",
-  "compilerOptions": {
-    "lib": ["es2022"],
-    "rootDir": "src",
-    "outDir": "dist"
-  },
-  "include": ["src"]
-}

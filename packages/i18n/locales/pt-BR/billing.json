@@ -1,0 +1,11 @@
+{
+  "plan": {
+    "maxActiveStudentsInvalid": "O limite de alunos ativos do plano deve ser um inteiro positivo.",
+    "pricingLastTierBounded": "As faixas de preço devem terminar em uma faixa sem limite.",
+    "pricingTiersNotAscending": "As faixas de preço devem ter limites inteiros e crescentes."
+  },
+  "subscription": {
+    "organizationRequired": "A assinatura deve pertencer a uma organização.",
+    "duplicated": "A organização já possui uma assinatura."
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "password": {
+    "required": "A senha é obrigatória.",
+    "confirmationRequired": "A confirmação de senha é obrigatória.",
+    "confirmationMismatch": "A confirmação de senha não confere."
+  },
+  "contact": {
+    "emailOrPhoneRequired": "Informe ao menos um e-mail ou celular."
+  },
+  "user": {
+    "emailOrPhoneRequired": "O usuário deve ter ao menos um e-mail ou celular.",
+    "passwordRequired": "O usuário deve ter uma senha.",
+    "idTaken": "Já existe um usuário com o id {id}."
+  },
+  "organization": {
+    "nameLength": "O nome da organização deve ter entre {min} e {max} caracteres.",
+    "alreadyBusiness": "A organização já é do tipo empresa.",
+    "idTaken": "Já existe uma organização com o id {id}."
+  },
+  "organizationMember": {
+    "incomplete": "O vínculo deve pertencer a um usuário e a uma organização.",
+    "sameRole": "O vínculo já possui esse papel.",
+    "duplicated": "O usuário já é membro desta organização."
+  }
+}

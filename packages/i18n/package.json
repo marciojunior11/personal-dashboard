@@ -2,29 +2,10 @@
   "name": "@personal-dashboard/i18n",
   "version": "0.0.0",
   "private": true,
+  "description": "Translation resources: one folder per locale, one JSON catalog per module. No code, and nothing about errors.",
   "type": "module",
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
-    }
-  },
-  "scripts": {
-    "clean": "node -e \"require('fs').rmSync('dist', { recursive: true, force: true })\"",
-    "build": "pnpm clean && tsc -p tsconfig.build.json",
-    "dev": "tsc -p tsconfig.build.json --watch --preserveWatchOutput",
-    "lint": "eslint . --max-warnings 0",
-    "check-types": "tsc --noEmit",
-    "test": "vitest run"
-  },
-  "devDependencies": {
-    "@personal-dashboard/eslint-config": "workspace:*",
-    "@personal-dashboard/typescript-config": "workspace:*",
-    "eslint": "10.9.1",
-    "typescript": "7.0.2",
-    "vitest": "^4.1.12"
-  },
-  "dependencies": {
-    "intl-messageformat": "^12.1.4"
+    "./package.json": "./package.json",
+    "./locales/*": "./locales/*"
   }
 }

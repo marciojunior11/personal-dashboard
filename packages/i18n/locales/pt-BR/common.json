@@ -1,0 +1,32 @@
+{
+  "errors": {
+    "invalidInput": "Os dados informados são inválidos.",
+    "domainRuleBroken": "A operação viola uma regra de domínio.",
+    "notFound": "Recurso não encontrado.",
+    "conflict": "O recurso já existe ou conflita com o estado atual.",
+    "unauthorized": "É necessário estar autenticado.",
+    "forbidden": "Você não tem permissão para realizar esta ação.",
+    "internal": "Ocorreu um erro inesperado. Tente novamente mais tarde."
+  },
+  "fullName": {
+    "required": "O nome completo é obrigatório.",
+    "missingSurname": "O nome completo deve conter nome e sobrenome.",
+    "tooLong": "O nome completo deve ter no máximo {max} caracteres.",
+    "invalidCharacters": "O nome completo contém caracteres inválidos."
+  },
+  "email": {
+    "invalid": "E-mail inválido."
+  },
+  "phoneNumber": {
+    "invalid": "Número de celular inválido."
+  },
+  "birthDate": {
+    "required": "A data de nascimento é obrigatória.",
+    "invalidFormat": "Data de nascimento inválida. Use o formato AAAA-MM-DD.",
+    "invalid": "Data de nascimento inválida.",
+    "inFuture": "A data de nascimento não pode estar no futuro."
+  },
+  "money": {
+    "invalidCents": "O valor deve ser um número inteiro de centavos."
+  }
+}
