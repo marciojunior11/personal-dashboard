@@ -70,23 +70,30 @@ describe('POST /auth/register (e2e)', () => {
     );
   });
 
-  it('answers 422 with the broken domain rule under its field', async () => {
+  it('answers 422 with every broken format rule under its field, at once', async () => {
     const response = await request(app.getHttpServer())
       .post('/auth/register')
-      .send({ ...validInput, nomeCompleto: 'Maria' })
+      .send({ ...validInput, nomeCompleto: 'Maria', celular: '10987654321' })
       .expect(422);
 
     expect(response.body.error).toMatchObject({
       name: 'ValidationError',
       code: 'INVALID_INPUT',
-      issues: [
+    });
+    expect(response.body.error.issues).toEqual(
+      expect.arrayContaining([
         {
           field: 'nomeCompleto',
-          code: expect.any(String),
+          code: 'INVALID_INPUT',
           message: 'O nome completo deve conter nome e sobrenome.',
         },
-      ],
-    });
+        {
+          field: 'celular',
+          code: 'INVALID_INPUT',
+          message: 'Número de celular inválido.',
+        },
+      ]),
+    );
   });
 
   it('keeps Nest errors for unknown routes', async () => {

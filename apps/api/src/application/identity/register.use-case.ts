@@ -18,7 +18,6 @@ import type {
 } from '@application/billing';
 import { MisconfigurationError, type IUseCase } from '@application/common';
 import type { IPasswordHasher } from '@application/criptography';
-import { validateFields } from '@application/utils';
 import type { IOrganizationMemberRepository } from './organization-member-repository.interface.js';
 import type { IOrganizationRepository } from './organization-repository.interface.js';
 import type { IUserRepository } from './user-repository.interface.js';
@@ -42,19 +41,20 @@ export class RegisterUseCase implements IUseCase<IRegisterInput, IUserOutput> {
    * Expects `data` already validated against `registerInputSchema` at the
    * boundary (`ZodValidationPipe`).
    *
-   * @throws {ValidationError} when input fields break domain rules, with each
-   * message under the field that broke it.
+   * The schema applies the same format rules as the value objects, so their
+   * guards below should never fire here; they keep the use case correct on
+   * its own, for any caller that skips the schema.
+   *
+   * @throws {DomainError} when the input breaks a domain rule.
    * @throws {MisconfigurationError} when the catalog lacks the LIMITED plan.
    * `BillingModule` refuses to start in that case, so this guard should never
-   * fire; it keeps the use case correct on its own.
+   * fire either.
    */
   async handle(data: IRegisterInput): Promise<IUserOutput> {
-    const { nomeCompleto, dataNascimento, email, celular } = validateFields({
-      nomeCompleto: () => FullName.create(data.nomeCompleto),
-      dataNascimento: () => BirthDate.create(data.dataNascimento),
-      email: () => (data.email ? Email.create(data.email) : null),
-      celular: () => (data.celular ? PhoneNumber.create(data.celular) : null),
-    });
+    const fullName = FullName.create(data.nomeCompleto);
+    const birthDate = BirthDate.create(data.dataNascimento);
+    const email = data.email ? Email.create(data.email) : null;
+    const phone = data.celular ? PhoneNumber.create(data.celular) : null;
 
     const plan = await this.planRepository.findByCode(PlanCode.LIMITED);
     if (plan === null) {
@@ -64,14 +64,14 @@ export class RegisterUseCase implements IUseCase<IRegisterInput, IUserOutput> {
     }
 
     const user = User.create({
-      fullName: nomeCompleto,
-      birthDate: dataNascimento,
+      fullName,
+      birthDate,
       email,
-      phone: celular,
+      phone,
       passwordHash: await this.passwordHasher.hash(data.senha),
     });
     const organization = Organization.create({
-      name: OrganizationName.create(nomeCompleto.value),
+      name: OrganizationName.create(fullName.value),
       type: OrganizationType.INDIVIDUAL,
     });
     const owner = OrganizationMember.create({
