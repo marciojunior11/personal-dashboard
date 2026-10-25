@@ -1,4 +1,4 @@
-import { BaseError, ValidationError } from '@personal-dashboard/shared/errors';
+import { BaseError, DomainError } from '@personal-dashboard/shared/errors';
 import type { IRegisterInput } from '@personal-dashboard/shared/identity';
 import { PlanCode } from '@domain/billing';
 import { OrganizationMemberRole, OrganizationType } from '@domain/identity';
@@ -124,32 +124,18 @@ describe('RegisterUseCase', () => {
     ['dataNascimento', { dataNascimento: '2023-02-30' }],
     ['celular', { celular: '10987654321' }],
   ] as const)(
-    'files a broken domain rule under its field (%s), before hashing or writing',
-    async (field, overrides) => {
+    'guards domain rules when the schema is skipped (%s), before hashing or writing',
+    async (_, overrides) => {
       const hash = vi.spyOn(fakeHasher, 'hash');
       const inserts = spyOnInserts();
 
-      const error = await useCase.handle(input(overrides)).catch((e) => e);
-
-      expect(error).toBeInstanceOf(ValidationError);
-      expect(Object.keys(error.data)).toEqual([field]);
-      expect(error.data[field]).toEqual([expect.any(String)]);
+      await expect(useCase.handle(input(overrides))).rejects.toThrow(
+        DomainError,
+      );
       expect(hash).not.toHaveBeenCalled();
       inserts.forEach((insert) => expect(insert).not.toHaveBeenCalled());
     },
   );
-
-  it('reports every broken field at once', async () => {
-    const error = await useCase
-      .handle(input({ nomeCompleto: 'Maria', celular: '10987654321' }))
-      .catch((e) => e);
-
-    expect(error).toBeInstanceOf(ValidationError);
-    expect(error.data).toEqual({
-      nomeCompleto: ['O nome completo deve conter nome e sobrenome.'],
-      celular: ['Número de celular inválido.'],
-    });
-  });
 
   it('throws MisconfigurationError when the LIMITED plan is missing, before writing', async () => {
     useCase = createUseCase(emptyCatalog);

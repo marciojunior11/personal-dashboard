@@ -1,22 +1,48 @@
 import { z } from "zod";
+import {
+  checkBirthDate,
+  checkEmail,
+  checkFullName,
+  checkPhoneNumber,
+  normalizeBirthDate,
+  normalizeEmail,
+  normalizeFullName,
+  normalizePhoneNumber,
+} from "../common/rules/index.js";
+import { rule } from "../utils/index.js";
 
 /** A string whose missing/wrong-type error uses `message` instead of zod's default. */
 const requiredString = (message: string) => z.string({ error: message });
 
 const ONE_IDENTIFIER_MESSAGE = "Informe ao menos um e-mail ou celular.";
 
-/** Validates the data required to register a new user. */
+/**
+ * Validates the data required to register a new user. Field formats use the
+ * same rules as the domain's value objects, so every field error is caught
+ * here, by its field, before the request reaches the domain.
+ */
 export const registerInputSchema = z
   .object({
     nomeCompleto: requiredString("O nome completo é obrigatório.")
       .trim()
-      .min(1, "O nome completo é obrigatório."),
+      .min(1, "O nome completo é obrigatório.")
+      .transform(normalizeFullName)
+      .superRefine(rule(checkFullName)),
     /** ISO 8601 date (`YYYY-MM-DD`). */
-    dataNascimento: z.iso.date("Use o formato AAAA-MM-DD."),
-    email: z.email("E-mail inválido.").optional(),
+    dataNascimento: requiredString("A data de nascimento é obrigatória.")
+      .trim()
+      .min(1, "A data de nascimento é obrigatória.")
+      .transform(normalizeBirthDate)
+      .superRefine(rule(checkBirthDate)),
+    email: z
+      .string({ error: "E-mail inválido." })
+      .transform(normalizeEmail)
+      .superRefine(rule(checkEmail))
+      .optional(),
     celular: z
       .string({ error: "Celular inválido." })
-      .regex(/^[\d\s()+-]{10,}$/, "Celular inválido.")
+      .transform(normalizePhoneNumber)
+      .superRefine(rule(checkPhoneNumber))
       .optional(),
     senha: requiredString("A senha é obrigatória.").min(
       1,

@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { FieldErrors } from "@personal-dashboard/shared/errors";
+import { hasIssues } from "@personal-dashboard/shared/utils";
 import {
   registerInputSchema,
   type IRegisterInput,
@@ -27,11 +27,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { postJson } from "@/lib/api";
-
-/** `code` of a `ValidationError`, whose `data` holds messages per field. */
-const VALIDATION_ERROR_CODE = "VE-001";
-const UNREACHABLE_MESSAGE =
-  "Não foi possível falar com o servidor. Tente novamente mais tarde.";
+import { ClientMessage } from "@/lib/messages";
 
 /** Sign-up page: the form that creates a professional's account. */
 export function RegistrationForm() {
@@ -52,7 +48,7 @@ export function RegistrationForm() {
       () => null,
     );
     if (result === null) {
-      toast.error(UNREACHABLE_MESSAGE);
+      toast.error(ClientMessage.API_UNREACHABLE);
       return;
     }
 
@@ -62,20 +58,20 @@ export function RegistrationForm() {
       return;
     }
 
-    // Input and domain rule errors come per field: show each next to its own.
+    // An error tied to fields shows next to each one, whatever its category;
+    // anything else goes to a toast.
     const { error } = result;
-    if (error?.code === VALIDATION_ERROR_CODE) {
-      const fields = error.data as FieldErrors<keyof IRegisterInput>;
-      for (const [field, messages] of Object.entries(fields)) {
-        form.setError(field as keyof IRegisterInput, {
-          type: "server",
-          message: messages?.[0],
+    if (hasIssues(error)) {
+      for (const issue of error.issues) {
+        form.setError(issue.field as keyof IRegisterInput, {
+          type: issue.code,
+          message: issue.message,
         });
       }
       return;
     }
 
-    toast.error(error?.message ?? UNREACHABLE_MESSAGE);
+    toast.error(error?.message ?? ClientMessage.API_UNREACHABLE);
   }
 
   return (

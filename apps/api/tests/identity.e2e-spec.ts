@@ -56,27 +56,44 @@ describe('POST /auth/register (e2e)', () => {
     expect(response.body.isFailure).toBe(true);
     expect(response.body.error).toMatchObject({
       name: 'ValidationError',
-      code: 'VE-001',
-      data: {
-        email: ['E-mail inválido.'],
-        confirmacaoSenha: ['A confirmação de senha não confere.'],
-      },
+      code: 'INVALID_INPUT',
     });
+    expect(response.body.error.issues).toEqual(
+      expect.arrayContaining([
+        { field: 'email', code: 'INVALID_INPUT', message: 'E-mail inválido.' },
+        {
+          field: 'confirmacaoSenha',
+          code: 'INVALID_INPUT',
+          message: 'A confirmação de senha não confere.',
+        },
+      ]),
+    );
   });
 
-  it('answers 422 with the broken domain rule under its field', async () => {
+  it('answers 422 with every broken format rule under its field, at once', async () => {
     const response = await request(app.getHttpServer())
       .post('/auth/register')
-      .send({ ...validInput, nomeCompleto: 'Maria' })
+      .send({ ...validInput, nomeCompleto: 'Maria', celular: '10987654321' })
       .expect(422);
 
     expect(response.body.error).toMatchObject({
       name: 'ValidationError',
-      code: 'VE-001',
-      data: {
-        nomeCompleto: ['O nome completo deve conter nome e sobrenome.'],
-      },
+      code: 'INVALID_INPUT',
     });
+    expect(response.body.error.issues).toEqual(
+      expect.arrayContaining([
+        {
+          field: 'nomeCompleto',
+          code: 'INVALID_INPUT',
+          message: 'O nome completo deve conter nome e sobrenome.',
+        },
+        {
+          field: 'celular',
+          code: 'INVALID_INPUT',
+          message: 'Número de celular inválido.',
+        },
+      ]),
+    );
   });
 
   it('keeps Nest errors for unknown routes', async () => {
