@@ -1,4 +1,4 @@
-import { MessageCode } from '@personal-dashboard/i18n';
+import { IdentityErrorCodes } from '@personal-dashboard/shared/identity';
 import { DomainError } from '@personal-dashboard/shared/errors';
 import { Entity } from '@domain/common';
 import type { OrganizationName } from './organization-name.js';
@@ -59,7 +59,7 @@ export class Organization extends Entity<string> {
   /** Turns a self-employed professional's organization into a team one. */
   becomeBusiness(): void {
     if (this.props.type === OrganizationType.BUSINESS) {
-      throw new DomainError(MessageCode.ORGANIZATION_ALREADY_BUSINESS);
+      throw new DomainError(IdentityErrorCodes.ORGANIZATION_ALREADY_BUSINESS);
     }
     this.props.type = OrganizationType.BUSINESS;
   }

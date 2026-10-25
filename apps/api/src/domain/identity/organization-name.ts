@@ -1,4 +1,4 @@
-import { MessageCode } from '@personal-dashboard/i18n';
+import { IdentityErrorCodes } from '@personal-dashboard/shared/identity';
 import { DomainError } from '@personal-dashboard/shared/errors';
 import { ValueObject } from '@domain/common';
 
@@ -16,10 +16,13 @@ export class OrganizationName extends ValueObject<string> {
     const value = raw.trim().replace(/\s+/g, ' ');
 
     if (value.length < MIN_LENGTH || value.length > MAX_LENGTH) {
-      throw new DomainError(MessageCode.ORGANIZATION_NAME_LENGTH, {
-        min: MIN_LENGTH,
-        max: MAX_LENGTH,
-      });
+      throw new DomainError(
+        IdentityErrorCodes.ORGANIZATION_NAME_INVALID_LENGTH,
+        {
+          min: MIN_LENGTH,
+          max: MAX_LENGTH,
+        },
+      );
     }
 
     return new OrganizationName(value);

@@ -1,4 +1,4 @@
-import { MessageCode } from '@personal-dashboard/i18n';
+import { IdentityErrorCodes } from '@personal-dashboard/shared/identity';
 import { DomainError } from '@personal-dashboard/shared/errors';
 import {
   type BirthDate,
@@ -29,10 +29,10 @@ export class User extends Entity<string> {
     super(id);
 
     if (props.email === null && props.phone === null) {
-      throw new DomainError(MessageCode.USER_EMAIL_OR_PHONE_REQUIRED);
+      throw new DomainError(IdentityErrorCodes.USER_EMAIL_OR_PHONE_REQUIRED);
     }
     if (props.passwordHash.length === 0) {
-      throw new DomainError(MessageCode.USER_PASSWORD_REQUIRED);
+      throw new DomainError(IdentityErrorCodes.USER_PASSWORD_REQUIRED);
     }
   }
 

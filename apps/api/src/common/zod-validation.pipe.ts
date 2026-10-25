@@ -1,11 +1,14 @@
 import { Injectable, type PipeTransform } from '@nestjs/common';
-import { isMessageCode, type MessageParams } from '@personal-dashboard/i18n';
+import { CommonErrorCodes } from '@personal-dashboard/shared/common';
 import {
-  ErrorCode,
   ValidationError,
+  type ErrorParams,
   type IFieldIssue,
 } from '@personal-dashboard/shared/errors';
 import type { z } from 'zod';
+
+/** Error codes are UPPER_SNAKE_CASE; zod's own messages are sentences. */
+const ERROR_CODE_PATTERN = /^[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)*$/;
 
 /**
  * Validates a request value against a zod schema. Invalid values throw a
@@ -13,8 +16,8 @@ import type { z } from 'zod';
  * checks every field, so the client gets all of them at once. When a field
  * breaks several rules, the first one is reported, as the form shows it.
  *
- * The shared schemas use message codes as zod messages, so each issue keeps
- * its code and params, translated later in the client's locale. A message
+ * The shared schemas use error codes as zod messages, so each issue keeps
+ * its code and params; the exception filter picks its message. A message
  * that is not a code (zod's own text) becomes the generic `INVALID_INPUT`.
  */
 @Injectable()
@@ -31,12 +34,12 @@ export class ZodValidationPipe<T> implements PipeTransform<unknown, T> {
       if (issues.has(field)) continue;
 
       const params =
-        'params' in issue ? (issue.params as MessageParams) : undefined;
+        'params' in issue ? (issue.params as ErrorParams) : undefined;
       issues.set(field, {
         field,
-        code: isMessageCode(issue.message)
+        code: ERROR_CODE_PATTERN.test(issue.message)
           ? issue.message
-          : ErrorCode.INVALID_INPUT,
+          : CommonErrorCodes.INVALID_INPUT,
         ...(params && { params }),
       });
     }

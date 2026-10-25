@@ -1,4 +1,4 @@
-import { MessageCode } from '@personal-dashboard/i18n';
+import { CommonErrorCodes } from '@personal-dashboard/shared/common';
 import { DomainError } from '@personal-dashboard/shared/errors';
 import { ValueObject } from './value-object.js';
 
@@ -13,7 +13,7 @@ export class Money extends ValueObject<number> {
 
   static fromCents(cents: number): Money {
     if (!Number.isSafeInteger(cents) || cents < 0) {
-      throw new DomainError(MessageCode.MONEY_INVALID_CENTS);
+      throw new DomainError(CommonErrorCodes.MONEY_INVALID_CENTS);
     }
 
     return new Money(cents);

@@ -1,4 +1,4 @@
-import { MessageCode } from '@personal-dashboard/i18n';
+import { IdentityErrorCodes } from '@personal-dashboard/shared/identity';
 import { DomainError } from '@personal-dashboard/shared/errors';
 import { Entity } from '@domain/common';
 
@@ -35,7 +35,7 @@ export class OrganizationMember extends Entity<string> {
     super(id);
 
     if (props.userId.length === 0 || props.organizationId.length === 0) {
-      throw new DomainError(MessageCode.ORGANIZATION_MEMBER_INCOMPLETE);
+      throw new DomainError(IdentityErrorCodes.ORGANIZATION_MEMBER_INCOMPLETE);
     }
   }
 
@@ -74,7 +74,7 @@ export class OrganizationMember extends Entity<string> {
    */
   changeRole(role: OrganizationMemberRole): void {
     if (role === this.props.role) {
-      throw new DomainError(MessageCode.ORGANIZATION_MEMBER_SAME_ROLE);
+      throw new DomainError(IdentityErrorCodes.ORGANIZATION_MEMBER_SAME_ROLE);
     }
     this.props.role = role;
   }

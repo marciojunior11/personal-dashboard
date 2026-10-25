@@ -1,4 +1,4 @@
-import { MessageCode } from '@personal-dashboard/i18n';
+import { IdentityErrorCodes } from '@personal-dashboard/shared/identity';
 import { ConflictError } from '@personal-dashboard/shared/errors';
 import type { IOrganizationMemberRepository } from '@application/identity';
 import type { OrganizationMember } from '@domain/identity';
@@ -20,7 +20,9 @@ export class MockOrganizationMemberRepository implements IOrganizationMemberRepo
             existing.organizationId === member.organizationId),
       )
     ) {
-      throw new ConflictError(MessageCode.ORGANIZATION_MEMBER_DUPLICATED);
+      throw new ConflictError(
+        IdentityErrorCodes.ORGANIZATION_MEMBER_DUPLICATED,
+      );
     }
 
     this.members.push(member);

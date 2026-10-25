@@ -1,4 +1,4 @@
-import { MessageCode } from '@personal-dashboard/i18n';
+import { BillingErrorCodes } from '@personal-dashboard/shared/billing';
 import { DomainError } from '@personal-dashboard/shared/errors';
 import { Entity } from '@domain/common';
 import type { PlanPricing } from './plan-pricing.js';
@@ -36,7 +36,7 @@ export class Plan extends Entity<PlanCode> {
 
     const max = props.maxActiveStudents;
     if (max !== null && (!Number.isSafeInteger(max) || max < 1)) {
-      throw new DomainError(MessageCode.PLAN_MAX_ACTIVE_STUDENTS_INVALID);
+      throw new DomainError(BillingErrorCodes.PLAN_MAX_ACTIVE_STUDENTS_INVALID);
     }
   }
 

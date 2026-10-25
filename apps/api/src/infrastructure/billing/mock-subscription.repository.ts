@@ -1,4 +1,4 @@
-import { MessageCode } from '@personal-dashboard/i18n';
+import { BillingErrorCodes } from '@personal-dashboard/shared/billing';
 import { ConflictError } from '@personal-dashboard/shared/errors';
 import type { ISubscriptionRepository } from '@application/billing';
 import type { Subscription } from '@domain/billing';
@@ -19,7 +19,7 @@ export class MockSubscriptionRepository implements ISubscriptionRepository {
           existing.organizationId === subscription.organizationId,
       )
     ) {
-      throw new ConflictError(MessageCode.SUBSCRIPTION_DUPLICATED);
+      throw new ConflictError(BillingErrorCodes.SUBSCRIPTION_DUPLICATED);
     }
 
     this.subscriptions.push(subscription);

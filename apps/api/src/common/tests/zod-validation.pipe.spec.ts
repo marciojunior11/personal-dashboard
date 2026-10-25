@@ -1,22 +1,24 @@
-import { MessageCode } from '@personal-dashboard/i18n';
+import { CommonErrorCodes } from '@personal-dashboard/shared/common';
 import { ValidationError } from '@personal-dashboard/shared/errors';
 import { z } from 'zod';
 import { ZodValidationPipe } from '@common';
 
 const schema = z.object({
   name: z
-    .string({ error: MessageCode.FULL_NAME_REQUIRED })
-    .min(1, MessageCode.FULL_NAME_REQUIRED)
+    .string({ error: CommonErrorCodes.FULL_NAME_REQUIRED })
+    .min(1, CommonErrorCodes.FULL_NAME_REQUIRED)
     .superRefine((value, ctx) => {
       if (value.length > 3) {
         ctx.addIssue({
           code: 'custom',
-          message: MessageCode.FULL_NAME_TOO_LONG,
+          message: CommonErrorCodes.FULL_NAME_TOO_LONG,
           params: { max: 3 },
         });
       }
     }),
-  address: z.object({ street: z.string().min(3, MessageCode.INVALID_INPUT) }),
+  address: z.object({
+    street: z.string().min(3, CommonErrorCodes.INVALID_INPUT),
+  }),
   age: z.number().optional(),
 });
 

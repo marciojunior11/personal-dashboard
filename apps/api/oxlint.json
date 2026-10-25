@@ -17,7 +17,10 @@
   },
   "overrides": [
     {
-      "files": ["src/tests/**", "tests/**"],
+      "files": [
+        "src/tests/**",
+        "tests/**"
+      ],
       "rules": {
         "no-restricted-imports": "off"
       }
@@ -25,5 +28,8 @@
   ],
   "env": {
     "node": true
-  }
+  },
+  "ignorePatterns": [
+    "src/generated/**"
+  ]
 }
