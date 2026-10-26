@@ -7,6 +7,7 @@ import { I18nModule, I18nService } from 'nestjs-i18n';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import { ApiExceptionFilter, i18nOptions } from '@common';
+import { DatabaseModule } from '@infrastructure/database';
 import { IdentityModule } from '@presentation/identity';
 import type { I18nPath, I18nTranslations } from '@generated/i18n';
 
@@ -24,7 +25,7 @@ const ERROR_MESSAGES = {
 } satisfies Record<string, I18nPath>;
 
 @Module({
-  imports: [I18nModule.forRoot(i18nOptions), IdentityModule],
+  imports: [DatabaseModule, I18nModule.forRoot(i18nOptions), IdentityModule],
   controllers: [AppController],
   providers: [
     AppService,
