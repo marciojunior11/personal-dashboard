@@ -3,6 +3,7 @@ import type {
   IPlanRepository,
   ISubscriptionRepository,
 } from '@application/billing';
+import type { IUnitOfWork } from '@application/common';
 import type { IPasswordHasher } from '@application/criptography';
 import {
   RegisterUseCase,
@@ -11,10 +12,11 @@ import {
   type IUserRepository,
 } from '@application/identity';
 import { Argon2PasswordHasher } from '@infrastructure/criptography';
+import { UNIT_OF_WORK } from '@infrastructure/database';
 import {
-  MockOrganizationMemberRepository,
-  MockOrganizationRepository,
-  MockUserRepository,
+  PrismaOrganizationMemberRepository,
+  PrismaOrganizationRepository,
+  PrismaUserRepository,
 } from '@infrastructure/identity';
 import {
   BillingModule,
@@ -34,11 +36,14 @@ import {
   imports: [BillingModule],
   controllers: [AuthController],
   providers: [
-    { provide: USER_REPOSITORY, useClass: MockUserRepository },
-    { provide: ORGANIZATION_REPOSITORY, useClass: MockOrganizationRepository },
+    { provide: USER_REPOSITORY, useClass: PrismaUserRepository },
+    {
+      provide: ORGANIZATION_REPOSITORY,
+      useClass: PrismaOrganizationRepository,
+    },
     {
       provide: ORGANIZATION_MEMBER_REPOSITORY,
-      useClass: MockOrganizationMemberRepository,
+      useClass: PrismaOrganizationMemberRepository,
     },
     { provide: PASSWORD_HASHER, useClass: Argon2PasswordHasher },
     {
@@ -50,6 +55,7 @@ import {
         plans: IPlanRepository,
         subscriptions: ISubscriptionRepository,
         hasher: IPasswordHasher,
+        unitOfWork: IUnitOfWork,
       ) =>
         new RegisterUseCase(
           users,
@@ -58,6 +64,7 @@ import {
           plans,
           subscriptions,
           hasher,
+          unitOfWork,
         ),
       inject: [
         USER_REPOSITORY,
@@ -66,6 +73,7 @@ import {
         PLAN_REPOSITORY,
         SUBSCRIPTION_REPOSITORY,
         PASSWORD_HASHER,
+        UNIT_OF_WORK,
       ],
     },
   ],

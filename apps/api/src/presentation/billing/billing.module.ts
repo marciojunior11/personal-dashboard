@@ -4,8 +4,8 @@ import {
   type IPlanRepository,
 } from '@application/billing';
 import {
-  MockPlanRepository,
-  MockSubscriptionRepository,
+  PrismaPlanRepository,
+  PrismaSubscriptionRepository,
 } from '@infrastructure/billing';
 import { PLAN_REPOSITORY, SUBSCRIPTION_REPOSITORY } from './billing.tokens.js';
 
@@ -18,8 +18,11 @@ import { PLAN_REPOSITORY, SUBSCRIPTION_REPOSITORY } from './billing.tokens.js';
  */
 @Module({
   providers: [
-    { provide: PLAN_REPOSITORY, useClass: MockPlanRepository },
-    { provide: SUBSCRIPTION_REPOSITORY, useClass: MockSubscriptionRepository },
+    { provide: PLAN_REPOSITORY, useClass: PrismaPlanRepository },
+    {
+      provide: SUBSCRIPTION_REPOSITORY,
+      useClass: PrismaSubscriptionRepository,
+    },
   ],
   exports: [PLAN_REPOSITORY, SUBSCRIPTION_REPOSITORY],
 })
