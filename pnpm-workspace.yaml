@@ -9,7 +9,10 @@ packageExtensions:
     peerDependencies:
       typescript: "*"
 allowBuilds:
+  # Download the engines the Prisma CLI needs (migrate, generate).
+  '@prisma/engines': true
   argon2: false
+  prisma: true
 minimumReleaseAgeExclude:
   - '@turbo/darwin-64@2.11.10'
   - '@turbo/darwin-arm64@2.11.10'

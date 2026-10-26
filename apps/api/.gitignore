@@ -1,0 +1,6 @@
+# Local environment files; .env.example documents them.
+.env*
+!.env.example
+
+# Prisma client, generated from prisma/schema by `prisma generate`.
+src/generated/prisma/

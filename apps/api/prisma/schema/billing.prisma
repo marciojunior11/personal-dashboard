@@ -1,0 +1,40 @@
+// Billing: the plan catalog and each organization's subscription.
+// These are table shapes only; the domain entities live in src/domain.
+
+enum PlanCode {
+  LIMITED
+  ON_DEMAND
+  UNLIMITED
+}
+
+/// The catalog. Its rows are reference data the system needs to run, so they
+/// are inserted by a migration, not by a seed.
+model Plan {
+  code              PlanCode @id
+  /// null means no cap.
+  maxActiveStudents Int?     @map("max_active_students")
+  /// PlanPricing: { type: "FREE" } | { type: "FLAT", priceCents } | { type: "TIERED", tiers: [{ upTo, priceCents }] }.
+  pricing           Json
+
+  subscriptions Subscription[]
+
+  @@map("plans")
+}
+
+model Subscription {
+  id                String   @id @db.Uuid
+  /// An organization has exactly one subscription.
+  organizationId    String   @unique @map("organization_id") @db.Uuid
+  planCode          PlanCode @map("plan_code")
+  /// The plan's terms copied at subscription time, so catalog changes never
+  /// affect existing customers.
+  maxActiveStudents Int?     @map("max_active_students")
+  pricing           Json
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  plan         Plan         @relation(fields: [planCode], references: [code])
+
+  @@map("subscriptions")
+}
