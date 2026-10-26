@@ -1,0 +1,58 @@
+// Identity: users, the organizations they belong to, and their memberships.
+// These are table shapes only; the domain entities live in src/domain.
+
+enum OrganizationType {
+  INDIVIDUAL
+  BUSINESS
+}
+
+enum OrganizationMemberRole {
+  OWNER
+  PROFESSIONAL
+}
+
+model User {
+  id           String   @id @db.Uuid
+  fullName     String   @map("full_name") @db.VarChar(150)
+  birthDate    DateTime @map("birth_date") @db.Date
+  /// Unique, so two accounts never share an e-mail, even under concurrent sign-ups.
+  email        String?  @unique @db.VarChar(254)
+  /// 11 digits; unique for the same reason as the e-mail.
+  phone        String?  @unique @db.VarChar(11)
+  passwordHash String   @map("password_hash")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  memberships OrganizationMember[]
+
+  @@map("users")
+}
+
+model Organization {
+  id        String           @id @db.Uuid
+  name      String           @db.VarChar(150)
+  type      OrganizationType
+  createdAt DateTime         @default(now()) @map("created_at")
+  updatedAt DateTime         @updatedAt @map("updated_at")
+
+  members      OrganizationMember[]
+  subscription Subscription?
+
+  @@map("organizations")
+}
+
+model OrganizationMember {
+  id             String                 @id @db.Uuid
+  userId         String                 @map("user_id") @db.Uuid
+  organizationId String                 @map("organization_id") @db.Uuid
+  role           OrganizationMemberRole
+  createdAt      DateTime               @default(now()) @map("created_at")
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  /// A user joins each organization at most once.
+  @@unique([userId, organizationId])
+  @@index([organizationId])
+  @@map("organization_members")
+}

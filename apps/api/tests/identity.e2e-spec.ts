@@ -3,6 +3,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 import type { App } from 'supertest/types.js';
 import { AppModule } from '../src/app.module.js';
+import { PrismaService } from '../src/infrastructure/database/index.js';
+import { resetDatabase } from './support/database.js';
 
 const validInput = {
   nomeCompleto: 'Maria da Silva',
@@ -14,6 +16,7 @@ const validInput = {
 
 describe('POST /auth/register (e2e)', () => {
   let app: INestApplication<App>;
+  let prisma: PrismaService;
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -22,6 +25,8 @@ describe('POST /auth/register (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
     await app.init();
+    prisma = app.get(PrismaService);
+    await resetDatabase(prisma);
   });
 
   afterEach(async () => {
@@ -45,6 +50,57 @@ describe('POST /auth/register (e2e)', () => {
       },
       error: null,
     });
+  });
+
+  it('stores the user, an INDIVIDUAL organization, its OWNER and a LIMITED subscription', async () => {
+    const response = await request(app.getHttpServer())
+      .post('/auth/register')
+      .send(validInput)
+      .expect(201);
+    const userId: string = response.body.value.id;
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        memberships: {
+          include: { organization: { include: { subscription: true } } },
+        },
+      },
+    });
+    expect(user?.email).toBe('maria@mail.com');
+    expect(user?.passwordHash).not.toBe(validInput.senha);
+    expect(user?.memberships).toHaveLength(1);
+
+    const [membership] = user!.memberships;
+    expect(membership.role).toBe('OWNER');
+    expect(membership.organization).toMatchObject({
+      name: 'Maria da Silva',
+      type: 'INDIVIDUAL',
+    });
+    expect(membership.organization.subscription).toMatchObject({
+      planCode: 'LIMITED',
+      maxActiveStudents: 3,
+    });
+  });
+
+  it('answers 409 for an e-mail already registered, storing nothing', async () => {
+    await request(app.getHttpServer())
+      .post('/auth/register')
+      .send(validInput)
+      .expect(201);
+
+    const response = await request(app.getHttpServer())
+      .post('/auth/register')
+      .send({ ...validInput, nomeCompleto: 'Outra Pessoa' })
+      .expect(409);
+
+    expect(response.body.error).toMatchObject({
+      name: 'ConflictError',
+      code: 'USER_EMAIL_TAKEN',
+      message: 'Já existe uma conta com este e-mail.',
+    });
+    expect(await prisma.user.count()).toBe(1);
+    expect(await prisma.organization.count()).toBe(1);
   });
 
   it('answers 422 with field errors for an invalid input', async () => {

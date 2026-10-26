@@ -1,0 +1,12 @@
+// The models live in one file per feature (identity.prisma, billing.prisma);
+// this one only holds the generator and the datasource.
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../../src/generated/prisma"
+  moduleFormat = "esm"
+}
+
+datasource db {
+  provider = "postgresql"
+}

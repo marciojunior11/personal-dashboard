@@ -10,7 +10,9 @@
   "user": {
     "emailOrPhoneRequired": "O usuário deve ter ao menos um e-mail ou celular.",
     "passwordRequired": "O usuário deve ter uma senha.",
-    "idTaken": "Já existe um usuário com o id {id}."
+    "idTaken": "Já existe um usuário com o id {id}.",
+    "emailTaken": "Já existe uma conta com este e-mail.",
+    "phoneTaken": "Já existe uma conta com este celular."
   },
   "organization": {
     "nameLength": "O nome da organização deve ter entre {min} e {max} caracteres.",

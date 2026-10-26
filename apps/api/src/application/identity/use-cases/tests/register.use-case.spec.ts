@@ -3,7 +3,7 @@ import type { IRegisterInput } from '@personal-dashboard/shared/identity';
 import { PlanCode } from '@domain/billing';
 import { OrganizationMemberRole, OrganizationType } from '@domain/identity';
 import type { IPlanRepository } from '@application/billing';
-import { MisconfigurationError } from '@application/common';
+import { MisconfigurationError, type IUnitOfWork } from '@application/common';
 import type { IPasswordHasher } from '@application/criptography';
 import { RegisterUseCase } from '@application/identity';
 import {
@@ -22,6 +22,9 @@ const fakeHasher: IPasswordHasher = {
 };
 
 const emptyCatalog: IPlanRepository = { findByCode: async () => null };
+
+/** Runs the work as is; the transaction itself is covered by the e2e tests. */
+const fakeUnitOfWork: IUnitOfWork = { run: (work) => work() };
 
 const input = (overrides: Partial<IRegisterInput> = {}): IRegisterInput => ({
   nomeCompleto: 'Maria da Silva',
@@ -47,6 +50,7 @@ describe('RegisterUseCase', () => {
       plans,
       subscriptions,
       fakeHasher,
+      fakeUnitOfWork,
     );
 
   /** Spies on every write, to assert nothing was persisted. */
@@ -110,6 +114,22 @@ describe('RegisterUseCase', () => {
     );
     expect(subscription?.planCode).toBe(PlanCode.LIMITED);
     expect(subscription?.maxActiveStudents).toBe(3);
+  });
+
+  it('writes everything inside one unit of work', async () => {
+    const run = vi.spyOn(fakeUnitOfWork, 'run');
+    const insertUser = vi.spyOn(users, 'insert');
+    let insertedInsideRun = false;
+    run.mockImplementationOnce(async (work) => {
+      const result = await work();
+      insertedInsideRun = insertUser.mock.calls.length === 1;
+      return result;
+    });
+
+    await useCase.handle(input());
+
+    expect(run).toHaveBeenCalledOnce();
+    expect(insertedInsideRun).toBe(true);
   });
 
   it('accepts only a phone', async () => {

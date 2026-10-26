@@ -16,11 +16,17 @@ import type {
   IPlanRepository,
   ISubscriptionRepository,
 } from '@application/billing';
-import { MisconfigurationError, type IUseCase } from '@application/common';
+import {
+  MisconfigurationError,
+  type IUnitOfWork,
+  type IUseCase,
+} from '@application/common';
 import type { IPasswordHasher } from '@application/criptography';
-import type { IOrganizationMemberRepository } from './organization-member-repository.interface.js';
-import type { IOrganizationRepository } from './organization-repository.interface.js';
-import type { IUserRepository } from './user-repository.interface.js';
+import type {
+  IOrganizationMemberRepository,
+  IOrganizationRepository,
+  IUserRepository,
+} from '@application/identity/repositories';
 
 /**
  * Registers a self-employed professional: creates the user, an INDIVIDUAL
@@ -35,6 +41,7 @@ export class RegisterUseCase implements IUseCase<IRegisterInput, IUserOutput> {
     private readonly planRepository: IPlanRepository,
     private readonly subscriptionRepository: ISubscriptionRepository,
     private readonly passwordHasher: IPasswordHasher,
+    private readonly unitOfWork: IUnitOfWork,
   ) {}
 
   /**
@@ -81,13 +88,15 @@ export class RegisterUseCase implements IUseCase<IRegisterInput, IUserOutput> {
     });
     const subscription = Subscription.create(organization.id, plan);
 
-    // Everything is built and validated before the first write. Without a
-    // transaction yet, a failed insert can still leave earlier ones behind;
-    // the user goes first because it is the one expected to conflict.
-    await this.userRepository.insert(user);
-    await this.organizationRepository.insert(organization);
-    await this.memberRepository.insert(owner);
-    await this.subscriptionRepository.insert(subscription);
+    // Everything is built and validated before the first write, and the four
+    // writes run in one transaction: a failure in any of them leaves nothing
+    // behind, not even a user without an organization.
+    await this.unitOfWork.run(async () => {
+      await this.userRepository.insert(user);
+      await this.organizationRepository.insert(organization);
+      await this.memberRepository.insert(owner);
+      await this.subscriptionRepository.insert(subscription);
+    });
 
     return {
       id: user.id,

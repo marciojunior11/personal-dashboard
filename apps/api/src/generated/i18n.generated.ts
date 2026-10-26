@@ -61,6 +61,8 @@ export type I18nTranslations = {
             "emailOrPhoneRequired": string;
             "passwordRequired": string;
             "idTaken": string;
+            "emailTaken": string;
+            "phoneTaken": string;
         };
         "organization": {
             "nameLength": string;
