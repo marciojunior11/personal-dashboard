@@ -13,6 +13,8 @@ export const IdentityErrorMessages = {
   USER_EMAIL_OR_PHONE_REQUIRED: "identity.user.emailOrPhoneRequired",
   USER_PASSWORD_REQUIRED: "identity.user.passwordRequired",
   USER_ID_TAKEN: "identity.user.idTaken",
+  USER_EMAIL_TAKEN: "identity.user.emailTaken",
+  USER_PHONE_TAKEN: "identity.user.phoneTaken",
 
   ORGANIZATION_NAME_INVALID_LENGTH: "identity.organization.nameLength",
   ORGANIZATION_ALREADY_BUSINESS: "identity.organization.alreadyBusiness",

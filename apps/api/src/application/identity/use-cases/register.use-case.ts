@@ -18,9 +18,11 @@ import type {
 } from '@application/billing';
 import { MisconfigurationError, type IUseCase } from '@application/common';
 import type { IPasswordHasher } from '@application/criptography';
-import type { IOrganizationMemberRepository } from './organization-member-repository.interface.js';
-import type { IOrganizationRepository } from './organization-repository.interface.js';
-import type { IUserRepository } from './user-repository.interface.js';
+import type {
+  IOrganizationMemberRepository,
+  IOrganizationRepository,
+  IUserRepository,
+} from '@application/identity/repositories';
 
 /**
  * Registers a self-employed professional: creates the user, an INDIVIDUAL

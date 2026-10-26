@@ -1,6 +1,6 @@
 import { PlanCode } from '@domain/billing';
 import { MisconfigurationError } from '@application/common';
-import type { IPlanRepository } from './plan-repository.interface.js';
+import type { IPlanRepository } from '@application/billing/repositories';
 
 /** Plans the system cannot run without: LIMITED is every new organization's plan. */
 export const REQUIRED_PLAN_CODES: readonly PlanCode[] = [PlanCode.LIMITED];
