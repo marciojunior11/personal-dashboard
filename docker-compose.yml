@@ -1,16 +1,17 @@
 # Local infrastructure for development and tests: `docker compose up -d`.
 services:
   postgres:
-    image: postgres:17-alpine
+    image: postgres:18
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
       POSTGRES_DB: ${POSTGRES_DB:-personal_dashboard}
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      # Postgres 18+ keeps its data in a version folder under this path.
+      - postgres-data:/var/lib/postgresql
       # Runs only when the volume is first created.
       - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
