@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { TransactionHost } from '@nestjs-cls/transactional';
 import type { IUnitOfWork } from '@application/common';
-import type { PrismaTransactionHost } from './prisma-transaction-host.js';
+import type { PrismaTransactionHost } from './prisma.transaction-host.js';
 
 /**
  * `IUnitOfWork` on a Prisma transaction. nestjs-cls keeps the transaction in
