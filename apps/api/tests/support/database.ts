@@ -6,6 +6,6 @@ import type { PrismaService } from '../../src/infrastructure/database/index.js';
  */
 export async function resetDatabase(prisma: PrismaService): Promise<void> {
   await prisma.$executeRawUnsafe(
-    'TRUNCATE TABLE "subscriptions", "organization_members", "organizations", "users" CASCADE',
+    'TRUNCATE TABLE "sessions", "subscriptions", "organization_members", "organizations", "users" CASCADE',
   );
 }

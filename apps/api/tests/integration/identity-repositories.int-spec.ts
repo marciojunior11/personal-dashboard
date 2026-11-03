@@ -13,11 +13,13 @@ import {
   OrganizationMemberRole,
   OrganizationName,
   OrganizationType,
+  Session,
   User,
 } from '../../src/domain/identity/index.js';
 import {
   PrismaOrganizationMemberRepository,
   PrismaOrganizationRepository,
+  PrismaSessionRepository,
   PrismaUserRepository,
 } from '../../src/infrastructure/identity/index.js';
 import { createDatabaseTestingModule } from '../support/database-testing-module.js';
@@ -42,16 +44,19 @@ describe('Prisma identity repositories', () => {
   let users: PrismaUserRepository;
   let organizations: PrismaOrganizationRepository;
   let members: PrismaOrganizationMemberRepository;
+  let sessions: PrismaSessionRepository;
 
   beforeEach(async () => {
     module = await createDatabaseTestingModule([
       PrismaUserRepository,
       PrismaOrganizationRepository,
       PrismaOrganizationMemberRepository,
+      PrismaSessionRepository,
     ]);
     users = module.get(PrismaUserRepository);
     organizations = module.get(PrismaOrganizationRepository);
     members = module.get(PrismaOrganizationMemberRepository);
+    sessions = module.get(PrismaSessionRepository);
   });
 
   afterEach(async () => {
@@ -149,6 +154,70 @@ describe('Prisma identity repositories', () => {
       expect(error.code).toBe(
         IdentityErrorCodes.ORGANIZATION_MEMBER_DUPLICATED,
       );
+    });
+  });
+
+  describe('PrismaSessionRepository', () => {
+    const NOW = new Date('2026-11-02T12:00:00.000Z');
+    const newSession = (userId: string, tokenHash: string, now = NOW) =>
+      Session.create(
+        { userId, tokenHash, userAgent: 'Mozilla/5.0', ip: '203.0.113.7' },
+        now,
+      );
+
+    it('stores a session and finds it by its token hash', async () => {
+      const user = newUser();
+      await users.insert(user);
+      const session = newSession(user.id, 'a'.repeat(64));
+      await sessions.insert(session);
+
+      const found = await sessions.findByTokenHash('a'.repeat(64));
+      expect(found?.equals(session)).toBe(true);
+      expect(found?.userId).toBe(user.id);
+      expect(found?.userAgent).toBe('Mozilla/5.0');
+      expect(found?.ip).toBe('203.0.113.7');
+      expect(found?.expiresAt).toEqual(session.expiresAt);
+      expect(found?.absoluteExpiresAt).toEqual(session.absoluteExpiresAt);
+      expect(await sessions.findByTokenHash('b'.repeat(64))).toBeNull();
+    });
+
+    it('persists a renewal', async () => {
+      const user = newUser();
+      await users.insert(user);
+      const session = newSession(user.id, 'a'.repeat(64));
+      await sessions.insert(session);
+
+      const later = new Date('2026-11-06T12:00:00.000Z');
+      session.renew(later);
+      await sessions.update(session);
+
+      const found = await sessions.findByTokenHash('a'.repeat(64));
+      expect(found?.lastSeenAt).toEqual(later);
+      expect(found?.expiresAt).toEqual(session.expiresAt);
+    });
+
+    it("lists a user's sessions, most recently used first, and deletes them", async () => {
+      const user = newUser();
+      await users.insert(user);
+      const older = newSession(user.id, 'a'.repeat(64));
+      const newer = newSession(
+        user.id,
+        'b'.repeat(64),
+        new Date('2026-11-03T12:00:00.000Z'),
+      );
+      await sessions.insert(older);
+      await sessions.insert(newer);
+
+      const found = await sessions.findByUserId(user.id);
+      expect(found.map((session) => session.id)).toEqual([newer.id, older.id]);
+
+      await sessions.delete(newer);
+      expect(await sessions.findByTokenHash('b'.repeat(64))).toBeNull();
+      // Deleting a session that is already gone is not an error.
+      await sessions.delete(newer);
+
+      await sessions.deleteByUserId(user.id);
+      expect(await sessions.findByUserId(user.id)).toEqual([]);
     });
   });
 });
