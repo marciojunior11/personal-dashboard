@@ -4,14 +4,14 @@ import type {
   ISubscriptionRepository,
 } from '@application/billing';
 import type { IUnitOfWork } from '@application/common';
-import type { IPasswordHasher } from '@application/criptography';
+import type { IPasswordHasher } from '@application/cryptography';
 import {
   RegisterUseCase,
   type IOrganizationMemberRepository,
   type IOrganizationRepository,
   type IUserRepository,
 } from '@application/identity';
-import { Argon2PasswordHasher } from '@infrastructure/criptography';
+import { Argon2PasswordHasher } from '@infrastructure/cryptography';
 import { UNIT_OF_WORK } from '@infrastructure/database';
 import {
   PrismaOrganizationMemberRepository,

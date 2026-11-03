@@ -1,5 +1,5 @@
 import argon2 from 'argon2';
-import type { IPasswordHasher } from '@application/criptography';
+import type { IPasswordHasher } from '@application/cryptography';
 
 interface Argon2Params {
   /** Memory cost, in KiB. */

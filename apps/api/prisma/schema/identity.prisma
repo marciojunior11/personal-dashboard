@@ -24,8 +24,33 @@ model User {
   updatedAt    DateTime @updatedAt @map("updated_at")
 
   memberships OrganizationMember[]
+  sessions    Session[]
 
   @@map("users")
+}
+
+model Session {
+  id                String   @id @db.Uuid
+  userId            String   @map("user_id") @db.Uuid
+  /// SHA-256 (hex) of the token sent in the cookie; the token itself is never stored.
+  tokenHash         String   @unique @map("token_hash") @db.Char(64)
+  /// Only shown in the list of the user's devices; never trusted for security.
+  userAgent         String?  @map("user_agent") @db.VarChar(512)
+  ip                String?  @db.Inet
+  createdAt         DateTime @default(now()) @map("created_at")
+  lastSeenAt        DateTime @map("last_seen_at")
+  /// When the session ends: the idle deadline, capped at the absolute one.
+  expiresAt         DateTime @map("expires_at")
+  /// The hard limit; no activity extends a session past it.
+  absoluteExpiresAt DateTime @map("absolute_expires_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  /// Lists and revokes every session of a user.
+  @@index([userId])
+  /// Lets a cleanup job delete the expired sessions.
+  @@index([expiresAt])
+  @@map("sessions")
 }
 
 model Organization {

@@ -74,6 +74,10 @@ export type I18nTranslations = {
             "sameRole": string;
             "duplicated": string;
         };
+        "session": {
+            "incomplete": string;
+            "expired": string;
+        };
     };
 };
 /* prettier-ignore */

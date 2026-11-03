@@ -23,4 +23,7 @@ export const IdentityErrorMessages = {
   ORGANIZATION_MEMBER_INCOMPLETE: "identity.organizationMember.incomplete",
   ORGANIZATION_MEMBER_SAME_ROLE: "identity.organizationMember.sameRole",
   ORGANIZATION_MEMBER_DUPLICATED: "identity.organizationMember.duplicated",
+
+  SESSION_INCOMPLETE: "identity.session.incomplete",
+  SESSION_EXPIRED: "identity.session.expired",
 } as const satisfies Record<IdentityErrorCode, string>;
