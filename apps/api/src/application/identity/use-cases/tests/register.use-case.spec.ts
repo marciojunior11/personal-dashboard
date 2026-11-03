@@ -4,7 +4,7 @@ import { PlanCode } from '@domain/billing';
 import { OrganizationMemberRole, OrganizationType } from '@domain/identity';
 import type { IPlanRepository } from '@application/billing';
 import { MisconfigurationError, type IUnitOfWork } from '@application/common';
-import type { IPasswordHasher } from '@application/criptography';
+import type { IPasswordHasher } from '@application/cryptography';
 import { RegisterUseCase } from '@application/identity';
 import {
   MockPlanRepository,

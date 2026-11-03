@@ -21,7 +21,7 @@ import {
   type IUnitOfWork,
   type IUseCase,
 } from '@application/common';
-import type { IPasswordHasher } from '@application/criptography';
+import type { IPasswordHasher } from '@application/cryptography';
 import type {
   IOrganizationMemberRepository,
   IOrganizationRepository,
