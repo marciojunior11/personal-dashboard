@@ -6,3 +6,4 @@ export * from './prisma.organization-member.repository.js';
 export * from './prisma.organization.repository.js';
 export * from './prisma.session.repository.js';
 export * from './prisma.user.repository.js';
+export * from './redis.session.repository.js';
